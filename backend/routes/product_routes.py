@@ -81,8 +81,14 @@ def create_product():
     if request.is_json:
         data = request.get_json()
     else:
-        # Support multipart/form-data for image upload
         data = request.form.to_dict()
+        if 'price' in data:
+            try: data['price'] = float(data['price'])
+            except ValueError: pass
+        if 'stock' in data:
+            try: data['stock'] = int(data['stock'])
+            except ValueError: pass
+            
         if 'image' in request.files:
             file = request.files['image']
             if file and file.filename != '':
@@ -128,8 +134,14 @@ def update_product(product_id):
     if request.is_json:
         data = request.get_json()
     else:
-        # Support multipart/form-data for image update
         data = request.form.to_dict()
+        if 'price' in data:
+            try: data['price'] = float(data['price'])
+            except ValueError: pass
+        if 'stock' in data:
+            try: data['stock'] = int(data['stock'])
+            except ValueError: pass
+            
         if 'image' in request.files:
             file = request.files['image']
             if file and file.filename != '':

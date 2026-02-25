@@ -29,9 +29,11 @@ class APIClient {
     }
 
     getHeaders(includeAuth = true, contentType = 'application/json') {
-        const headers = {
-            'Content-Type': contentType
-        };
+        const headers = {};
+
+        if (contentType && contentType !== 'multipart/form-data') {
+            headers['Content-Type'] = contentType;
+        }
 
         if (includeAuth && this.token) {
             headers['Authorization'] = `Bearer ${this.token}`;
