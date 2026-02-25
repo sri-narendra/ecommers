@@ -59,7 +59,8 @@ class APIClient {
             if (response.status === 401) {
                 this.clearToken();
             }
-            const error = new Error(data.message || `HTTP error! status: ${response.status}`);
+            const errorMsg = data.error || data.message || `HTTP error! status: ${response.status}`;
+            const error = new Error(errorMsg);
             error.status = response.status;
             error.response = data;
             throw error;
