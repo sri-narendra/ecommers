@@ -74,7 +74,7 @@ class Router {
     async checkGuard() {
         const currentPage = this.getCurrentPage();
         const isAuthenticated = !!localStorage.getItem('token');
-        const user = JSON.parse(localStorage.getItem('user') || 'null');
+        const user = getUser();
         const isAdmin = user && user.role === 'admin';
 
         // 404 Protection

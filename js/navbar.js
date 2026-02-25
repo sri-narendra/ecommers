@@ -8,14 +8,15 @@ class Navbar {
     }
 
     render() {
-        const placeholder = document.getElementById(this.placeholderId);
-        if (!placeholder) return;
+        try {
+            const placeholder = document.getElementById(this.placeholderId);
+            if (!placeholder) return;
 
-        const isAuthenticated = !!localStorage.getItem('token');
-        const user = JSON.parse(localStorage.getItem('user') || 'null');
-        const isAdminUser = user && user.role === 'admin';
+            const user = getUser();
+            const isAdminUser = user && user.role === 'admin';
+            const isAuthed = !!localStorage.getItem('token');
 
-        placeholder.innerHTML = `
+            placeholder.innerHTML = `
 <header class="sticky top-0 z-50 w-full border-b border-primary/10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
   <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
     <div class="flex items-center gap-10">
@@ -45,7 +46,7 @@ class Navbar {
           <span id="cart-badge" class="absolute -top-1 -right-1 hidden flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">0</span>
         </a>
         <div id="auth-nav-container">
-            ${isAuthenticated ? `
+            ${isAuthed ? `
                 <div class="group relative">
                     <button class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/5 hover:bg-primary/10 text-slate-700 dark:text-slate-200 transition-colors">
                         <span class="material-symbols-outlined">person</span>
@@ -66,8 +67,11 @@ class Navbar {
 </header>
         `;
 
-        this.setupEventListeners();
-        this.updateCartBadge();
+            this.setupEventListeners();
+            this.updateCartBadge();
+        } catch (e) {
+            console.error('Navbar render failed:', e);
+        }
     }
 
     isActive(page) {
@@ -108,7 +112,8 @@ class Navbar {
 
         try {
             const response = await api.getCart();
-            const count = response.cart?.items?.length || 0;
+            const cart = response.data?.cart || response.cart;
+            const count = cart?.items?.length || 0;
             if (count > 0) {
                 badge.textContent = count;
                 badge.classList.remove('hidden');

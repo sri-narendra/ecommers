@@ -194,8 +194,15 @@ function isAuthenticated() {
 
 // Get user from localStorage
 function getUser() {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
+    try {
+        const user = localStorage.getItem('user');
+        if (!user || user === 'undefined' || user === 'null') return null;
+        return JSON.parse(user);
+    } catch (e) {
+        console.error('Failed to parse user from storage:', e);
+        localStorage.removeItem('user');
+        return null;
+    }
 }
 
 // Check if user is admin
@@ -268,7 +275,12 @@ async function initPage(pageInitFunc) {
             await pageInitFunc();
         }
     } catch (error) {
-        console.error('Page initialization failed:', error);
+        console.error('CRITICAL: Page initialization failed:', error);
+        // If we fail during checkGuard, something is broken in auth/storage
+        if (error.message && error.message.includes('Unexpected token')) {
+            console.warn('Corruption detected. Clearing session.');
+            api.clearToken();
+        }
         showToast('Error loading page. Please refresh.', 'error');
     } finally {
         hideLoader();

@@ -42,12 +42,16 @@ class APIClient {
 
     async handleResponse(response) {
         let data;
+        const contentType = response.headers.get('content-type');
         
         try {
-            data = await response.json();
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                data = { message: await response.text() };
+            }
         } catch (e) {
-            // If response is not JSON, try text
-            data = { message: await response.text() };
+            data = { message: 'Failed to parse response body' };
         }
 
         if (!response.ok) {
@@ -58,6 +62,11 @@ class APIClient {
         }
 
         return data;
+    }
+
+    logout() {
+        this.clearToken();
+        window.location.href = 'login.html';
     }
 
     async get(endpoint) {
