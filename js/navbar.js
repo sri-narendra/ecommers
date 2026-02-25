@@ -73,7 +73,7 @@ class Navbar {
                     </div>
                 </div>
             ` : `
-                <a href="login.html" class="rounded-lg bg-primary px-5 py-2 text-sm font-bold text-white hover:bg-primary/90 transition-all shadow-sm shadow-primary/20">Login</a>
+                <a href="login.html" class="nav-link rounded-lg bg-primary px-5 py-2 text-sm font-bold text-white hover:bg-primary/90 transition-all shadow-sm shadow-primary/20">Login</a>
             `}
         </div>
       </div>
@@ -93,7 +93,7 @@ class Navbar {
     <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" id="mobile-menu-overlay"></div>
     <div class="absolute inset-y-0 left-0 w-3/4 max-w-sm bg-white dark:bg-slate-900 shadow-2xl p-6 flex flex-col gap-8">
       <div class="flex items-center justify-between">
-        <a class="flex items-center gap-2" href="index.html" onclick="event.preventDefault(); router.navigate('index.html')">
+        <a class="nav-link flex items-center gap-2" href="index.html">
           <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white">
             <span class="material-symbols-outlined text-sm">shopping_bag</span>
           </div>
@@ -110,11 +110,11 @@ class Navbar {
       <div class="mt-auto pt-6 border-t border-slate-100 dark:border-slate-800">
         ${isAuthed ? `
           <div class="flex flex-col gap-4">
-            <a href="profile.html" class="flex items-center gap-3 text-slate-600 dark:text-slate-400 font-medium"><span class="material-symbols-outlined">person</span>Profile</a>
+            <a href="profile.html" class="nav-link flex items-center gap-3 text-slate-600 dark:text-slate-400 font-medium"><span class="material-symbols-outlined">person</span>Profile</a>
             <button onclick="logout()" class="flex items-center gap-3 text-red-600 font-bold"><span class="material-symbols-outlined">logout</span>Logout</button>
           </div>
         ` : `
-          <a href="login.html" class="block w-full rounded-lg bg-primary py-3 text-center font-bold text-white shadow-lg">Login</a>
+          <a href="login.html" class="nav-link block w-full rounded-lg bg-primary py-3 text-center font-bold text-white shadow-lg">Login</a>
         `}
       </div>
     </div>
