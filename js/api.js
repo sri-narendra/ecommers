@@ -214,8 +214,8 @@ class APIClient {
         return this.delete('/api/cart/clear');
     }
 
-    async checkout() {
-        return this.post('/api/cart/checkout', {});
+    async checkout(data = {}) {
+        return this.post('/api/checkout', data);
     }
 
     // Order methods
@@ -232,11 +232,11 @@ class APIClient {
     }
 
     async updateTracking(id, trackingNumber) {
-        return this.put(`/api/admin/orders/${id}/tracking`, { tracking_number: trackingNumber });
+        return this.put(`/api/admin/orders/${id}/delivery`, { tracking_number: trackingNumber });
     }
 
     async updateDeliveryStatus(id, deliveryStatus) {
-        return this.put(`/api/admin/orders/${id}/delivery-status`, { delivery_status: deliveryStatus });
+        return this.put(`/api/admin/orders/${id}/delivery`, { delivery_status: deliveryStatus });
     }
 
     // Admin methods

@@ -175,8 +175,10 @@
     const content = document.getElementById('checkout-content');
 
     try {
+      showLoader();
       const res = await api.get('/api/cart');
-      const items = res.cart?.items || res.items || [];
+      const cart = res.data?.cart || res.cart;
+      const items = cart?.items || [];
 
       if (!items || items.length === 0) { 
           router.navigate('cart.html');
@@ -187,15 +189,15 @@
 
       let subtotal = 0;
       document.getElementById('order-items').innerHTML = items.map(item => {
-        const price = item.product?.price || item.price || 0;
+        const price = item.price || 0;
         const qty = item.quantity || 1;
         subtotal += price * qty;
         return `<div class="flex gap-4">
           <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden flex-shrink-0">
-            <img class="w-full h-full object-cover" src="${item.product?.image_url || 'https://placehold.co/64x64/e2e8f0/94a3b8?text=P'}" alt="${item.product?.name || 'Product'}"/>
+            <img class="w-full h-full object-cover" src="${item.image_url || 'https://placehold.co/64x64/e2e8f0/94a3b8?text=P'}" alt="${item.name || 'Product'}"/>
           </div>
           <div class="flex-1">
-            <p class="text-sm font-bold truncate">${item.product?.name || 'Product'}</p>
+            <p class="text-sm font-bold truncate">${item.name || 'Product'}</p>
             <p class="text-xs text-slate-500">Qty: ${qty}</p>
             <p class="text-sm font-bold text-primary mt-1">$${(price * qty).toFixed(2)}</p>
           </div>
@@ -206,7 +208,9 @@
       document.getElementById('summary-total').textContent = '$' + subtotal.toFixed(2);
     } catch (err) {
       if (err.status === 401) router.navigate('login.html', { redirect: 'checkout.html' });
-      else router.navigate('cart.html');
+      else showToast('Could not load cart data.', 'error');
+    } finally {
+      hideLoader();
     }
   }
 
@@ -217,7 +221,7 @@
     const address = document.getElementById('address').value.trim();
 
     if (!firstName || !lastName || !address) {
-      alert('Please fill in all required shipping fields.');
+      showToast('Please fill in all required shipping fields.', 'error');
       return;
     }
 
@@ -225,15 +229,23 @@
     btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Placing Order...';
 
     try {
-      const res = await api.post('/api/checkout', {
-        shipping_address: { name: firstName + ' ' + lastName, address, city: document.getElementById('city').value, zip: document.getElementById('zip').value }
+      const res = await api.checkout({
+        shipping_address: { 
+            name: firstName + ' ' + lastName, 
+            address, 
+            city: document.getElementById('city').value, 
+            zip: document.getElementById('zip').value 
+        }
       });
+      
+      const orderId = res.data?.order?._id || res.data?.order?.id || res.order_id;
+      
       btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Order Placed!';
-      setTimeout(() => router.navigate('order-success.html', { orderId: res.order_id }), 1000);
+      setTimeout(() => router.navigate('order-success.html', { orderId: orderId }), 1000);
     } catch (err) {
       btn.disabled = false;
       btn.innerHTML = '<span class="material-symbols-outlined">lock</span> Place Order';
-      alert('Error placing order: ' + (err.message || 'Please try again.'));
+      showToast('Error placing order: ' + (err.message || 'Please try again.'), 'error');
     }
   }
 </script>

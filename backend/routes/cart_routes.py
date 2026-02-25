@@ -51,9 +51,9 @@ def get_cart():
         formatted_items.append({
             'product_id': str(product['_id']),
             'name': product['name'],
-            'price': product['price'], # cents
+            'price': product['price'] / 100, # convert cents to dollars
             'quantity': cart_item['quantity'],
-            'total': product['price'] * cart_item['quantity'],
+            'total': (product['price'] * cart_item['quantity']) / 100, # convert cents to dollars
             'stock': product['stock'],
             'image_url': image_url
         })
@@ -63,7 +63,7 @@ def get_cart():
         data={
             'cart': {
                 'items': formatted_items,
-                'total_cents': cart_total_cents
+                'total': cart_total_cents / 100 # convert total to dollars
             }
         }
     )

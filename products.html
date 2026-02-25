@@ -111,7 +111,7 @@
   async function loadProducts() {
     try {
       const response = await api.get('/api/products');
-      allProducts = response.products || [];
+      allProducts = response.data?.products || response.products || [];
       buildCategorySidebar(allProducts);
       applyFilters();
     } catch (error) {
@@ -154,7 +154,7 @@
     }
     noProducts.classList.add('hidden');
     grid.innerHTML = products.map(product => `
-      <div class="bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-shadow group cursor-pointer" onclick="router.navigate('product-details.html', { id: '${product._id}' })">
+      <div class="bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-shadow group cursor-pointer" onclick="router.navigate('product-details.html', { id: '${product._id || product.id}' })">
         <div class="relative aspect-[4/3] overflow-hidden">
           ${product.stock < 5 ? '<div class="absolute top-2 left-2 z-10"><span class="bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">Low Stock</span></div>' : ''}
           <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="${product.image_url || 'https://placehold.co/400x300/e2e8f0/94a3b8?text=' + encodeURIComponent(product.name)}" alt="${product.name}"/>
@@ -166,10 +166,10 @@
           </div>
           <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mb-4">${product.description || ''}</p>
           <div class="flex gap-2">
-            <button onclick="event.stopPropagation(); addToCartInline('${product._id}', 1, this)" class="flex-1 bg-primary text-white py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+            <button onclick="event.stopPropagation(); addToCartInline('${product._id || product.id}', 1, this)" class="flex-1 bg-primary text-white py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
               <span class="material-symbols-outlined text-lg">shopping_cart</span>Add to Cart
             </button>
-            <button onclick="event.stopPropagation(); router.navigate('product-details.html', { id: '${product._id}' })" class="px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+            <button onclick="event.stopPropagation(); router.navigate('product-details.html', { id: '${product._id || product.id}' })" class="px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
               <span class="material-symbols-outlined text-lg">visibility</span>
             </button>
           </div>
@@ -179,8 +179,14 @@
   }
 
   async function addToCartInline(productId, quantity, btn) {
+    if (!isAuthenticated()) {
+        router.navigate('login.html', { redirect: 'products.html' });
+        return;
+    }
+
     try {
-      await api.post('/api/products/' + productId + '/add-to-cart', { quantity });
+      showLoader();
+      await api.addToCart(productId, quantity);
       showToast('Added to cart!', 'success');
       if (btn) { 
         const original = btn.innerHTML;
@@ -192,8 +198,10 @@
       if (error.status === 401) {
           router.navigate('login.html', { redirect: 'products.html' });
       } else {
-          showToast('Error: ' + error.message, 'error');
+          showToast(error.message || 'Could not add to cart.', 'error');
       }
+    } finally {
+      hideLoader();
     }
   }
 

@@ -4,60 +4,68 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Order Success - ShopEase</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-<script>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
     tailwind.config = {
         darkMode: "class",
         theme: {
             extend: {
-                colors: { primary: "#137fec", "background-dark": "#101922" },
-                fontFamily: { display: ["Inter", "sans-serif"] },
+                colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                fontFamily: { "display": ["Inter", "sans-serif"] },
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
             },
         },
-    };
+    }
 </script>
 <style>
     body { font-family: 'Inter', sans-serif; }
-    .hidden { display: none !important; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
 </style>
 </head>
-<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col antialiased">
 
 <!-- Navigation -->
 <div id="navbar-placeholder"></div>
 
-<main class="flex-grow flex items-center justify-center px-4 py-12">
-    <div class="max-w-md w-full text-center space-y-8 animate-in fade-in zoom-in duration-500">
+<main class="flex-grow flex items-center justify-center px-4 py-20">
+    <div class="max-w-md w-full text-center space-y-10 animate-in fade-in zoom-in duration-700">
         <div class="flex flex-col items-center">
-            <div class="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-6">
-                <span class="material-icons text-green-500 text-4xl">check_circle</span>
+            <div class="w-24 h-24 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-8 shadow-inner">
+                <span class="material-symbols-outlined text-green-500 text-5xl font-black">check_circle</span>
             </div>
-            <h1 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Order Confirmed!</h1>
-            <p class="text-slate-500 dark:text-slate-400 mt-2">Thank you for your purchase. Your order has been placed successfully.</p>
+            <h1 class="text-4xl font-black tracking-tight text-slate-900 dark:text-white">Order Confirmed!</h1>
+            <p class="text-slate-500 dark:text-slate-400 mt-4 text-lg leading-relaxed">Thank you for your purchase. We've received your order and are preparing it for shipment.</p>
         </div>
 
-        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-primary/10 p-6 shadow-sm text-left">
-            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">Order Summary</h3>
-            <div class="space-y-3">
-                <div class="flex justify-between text-sm">
-                    <span class="text-slate-500">Order ID</span>
-                    <span id="order-id-display" class="font-mono font-bold text-primary">#—</span>
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-primary/10 p-8 shadow-xl text-left relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16"></div>
+            <h3 class="text-xs font-black uppercase tracking-[0.2em] text-primary mb-6">Order Details</h3>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center text-sm border-b border-slate-50 dark:border-slate-800 pb-3">
+                    <span class="text-slate-500 font-medium">Order Reference</span>
+                    <span id="order-id-display" class="font-mono font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded">#—</span>
                 </div>
-                <div class="flex justify-between text-sm">
-                    <span class="text-slate-500">Status</span>
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700">PROCESSING</span>
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-slate-500 font-medium">Expected Delivery</span>
+                    <span class="font-bold text-slate-900 dark:text-white">2-4 Business Days</span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-slate-500 font-medium">Status</span>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                        <span class="material-symbols-outlined text-[14px]">sync</span>PROCESSING
+                    </span>
                 </div>
             </div>
         </div>
 
-        <div class="flex flex-col gap-3">
-            <button onclick="router.navigate('profile.html')" class="w-full py-4 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all">
-                View My Orders
-            </button>
-            <button onclick="router.navigate('index.html')" class="w-full py-4 text-slate-600 dark:text-slate-400 font-bold hover:text-primary transition-colors">
+        <div class="flex flex-col gap-4">
+            <button onclick="router.navigate('index.html')" class="w-full py-4 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all hover:-translate-y-1 active:scale-95">
                 Continue Shopping
+            </button>
+            <button onclick="router.navigate('products.html')" class="w-full py-4 text-slate-600 dark:text-slate-400 font-bold hover:text-primary transition-colors flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined">shopping_bag</span>Browse More Products
             </button>
         </div>
     </div>
@@ -78,12 +86,10 @@
             const params = new URLSearchParams(window.location.search);
             const orderId = params.get('orderId');
             
-            if (orderId) {
+            if (orderId && orderId !== 'undefined') {
                 document.getElementById('order-id-display').textContent = `#${orderId.slice(-8).toUpperCase()}`;
             } else {
-                // If accessed directly without order ID, maybe redirect?
-                // For now just show "N/A"
-                document.getElementById('order-id-display').textContent = '#N/A';
+                document.getElementById('order-id-display').textContent = '#PENDING';
             }
         });
     });

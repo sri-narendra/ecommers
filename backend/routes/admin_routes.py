@@ -30,6 +30,11 @@ def admin_dashboard():
     total_products = product_model.collection.count_documents({})
     total_orders = order_model.collection.count_documents({})
     
+    # Calculate revenue (Bug Phase 3: 3)
+    pipeline = [{"$group": {"_id": None, "total": {"$sum": "$total_price"}}}]
+    order_stats = list(order_model.collection.aggregate(pipeline))
+    total_revenue_cents = order_stats[0]['total'] if order_stats else 0
+    
     # Get low stock products
     low_stock_products = product_model.get_low_stock_products(5)
     
@@ -40,6 +45,7 @@ def admin_dashboard():
                 'total_users': total_users,
                 'total_products': total_products,
                 'total_orders': total_orders,
+                'total_revenue': total_revenue_cents / 100, # convert cents to dollars
                 'low_stock_products_count': len(low_stock_products)
             },
             'low_stock_products': [

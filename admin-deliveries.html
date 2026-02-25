@@ -213,14 +213,21 @@
   }
 
   async function markDelivered(orderId) {
+    if (!confirm('Mark this order as delivered?')) return;
+    
     try {
-      // Correct endpoint: PUT /api/admin/orders/<id>/status
-      await api.put('/api/admin/orders/' + orderId + '/status', { status: 'delivered' });
+      showLoader();
+      await api.updateOrderStatus(orderId, 'delivered');
       const order = allDeliveries.find(o => (o.id || o._id) === orderId);
       if (order) order.status = 'delivered';
       updateStats();
       renderDeliveries(allDeliveries);
-    } catch (err) { alert('Error updating delivery: ' + err.message); }
+      showToast('Order marked as delivered', 'success');
+    } catch (err) { 
+      showToast('Error updating delivery: ' + err.message, 'error'); 
+    } finally {
+      hideLoader();
+    }
   }
 
   function logout() {

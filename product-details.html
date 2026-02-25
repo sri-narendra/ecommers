@@ -160,7 +160,7 @@
 
     try {
       const response = await api.get('/api/products/' + productId);
-      const product = response.product;
+      const product = response.data || response.product;
       currentProductId = productId;
 
       document.getElementById('product-image').src = product.image_url || 'https://placehold.co/600x600/e2e8f0/94a3b8?text=' + encodeURIComponent(product.name);
@@ -202,14 +202,20 @@
   }
 
   async function addToCartFromPage() {
+    if (!isAuthenticated()) {
+        router.navigate('login.html', { redirect: 'product-details.html?id=' + currentProductId });
+        return;
+    }
+
     const btn = document.getElementById('add-to-cart-btn');
     const qty = parseInt(document.getElementById('quantity').value) || 1;
     try {
       btn.disabled = true;
       btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Adding...';
-      await api.post('/api/products/' + currentProductId + '/add-to-cart', { quantity: qty });
+      await api.addToCart(currentProductId, qty);
       btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Added to Cart!';
       btn.className = btn.className.replace('bg-primary', 'bg-green-600');
+      if (window.updateCartBadge) window.updateCartBadge();
       setTimeout(() => {
         btn.disabled = false;
         btn.innerHTML = '<span class="material-symbols-outlined">shopping_cart</span> Add to Cart';
