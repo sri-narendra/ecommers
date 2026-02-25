@@ -59,11 +59,16 @@ class Navbar {
                     <button class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/5 hover:bg-primary/10 text-slate-700 dark:text-slate-200 transition-colors">
                         <span class="material-symbols-outlined">person</span>
                     </button>
-                    <div class="absolute right-0 top-full pt-2 w-48 origin-top-right hidden group-hover:block transition-all z-50">
+                    <div class="absolute right-0 top-0 pt-12 w-48 origin-top-right invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 z-50">
                         <div class="rounded-xl bg-white dark:bg-slate-800 p-2 shadow-xl ring-1 ring-slate-200 dark:ring-slate-700">
-                            <a href="profile.html" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-primary/10 hover:text-primary rounded-lg">Profile</a>
-                            ${isAdminUser ? `<a href="admin.html" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-primary/10 hover:text-primary rounded-lg">Admin Dashboard</a>` : ''}
-                            <button onclick="logout()" class="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg">Logout</button>
+                            <a href="profile.html" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-primary/10 hover:text-primary rounded-lg transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">account_circle</span> Profile
+                            </a>
+                            ${isAdminUser ? `<a href="admin.html" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-primary/10 hover:text-primary rounded-lg transition-colors"><span class="material-symbols-outlined text-[18px]">dashboard</span> Admin Hub</a>` : ''}
+                            <div class="my-1 border-t border-slate-100 dark:border-slate-700"></div>
+                            <button onclick="logout()" class="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">logout</span> Logout
+                            </button>
                         </div>
                     </div>
                 </div>
