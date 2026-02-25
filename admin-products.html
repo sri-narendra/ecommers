@@ -26,24 +26,17 @@
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
 <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
-<div class="layout-container flex h-full grow flex-col">
-<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary/10 bg-white dark:bg-slate-900 px-10 py-3">
-  <div class="flex items-center gap-8">
-    <div class="flex items-center gap-3 text-primary">
-      <span class="material-symbols-outlined text-3xl">inventory_2</span>
-      <h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight">ShopEase Admin</h2>
-    </div>
-  </div>
-  <nav class="hidden lg:flex items-center gap-6">
-    <a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="admin.html">Dashboard</a>
-    <a class="text-primary text-sm font-semibold border-b-2 border-primary py-1" href="admin-products.html">Inventory</a>
-    <a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="admin-orders.html">Orders</a>
-    <a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="admin-deliveries.html">Deliveries</a>
-  </nav>
-  <button onclick="logout()" class="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
-    <span class="material-symbols-outlined">logout</span>Logout
-  </button>
-</header>
+<!-- Admin Header -->
+<div id="admin-header-placeholder"></div>
+
+<div class="flex flex-1">
+  <!-- Admin Sidebar -->
+  <div id="admin-sidebar-placeholder"></div>
+<div id="admin-header-placeholder"></div>
+
+<div class="flex flex-1">
+  <!-- Admin Sidebar -->
+  <div id="admin-sidebar-placeholder"></div>
 
 <main class="flex-1 px-10 py-8">
   <div class="max-w-7xl mx-auto space-y-8">
@@ -157,15 +150,18 @@
 
 <script src="js/utils.js"></script>
 <script src="js/api.js"></script>
+<script src="js/router.js"></script>
+<script src="js/admin-layout.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/admin.js"></script>
 <script>
   let allProducts = [];
 
   document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('token');
-    if (!token) { window.location.href = 'login.html'; return; }
-    loadProducts();
+    initPage(async () => {
+        adminLayout.render();
+        await loadProducts();
+    });
   });
 
   async function loadProducts() {
@@ -298,6 +294,10 @@
     } catch (err) { alert('Error: ' + err.message); }
   }
 
-  function logout() { localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href = 'login.html'; }
+  function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+        api.logout();
+    }
+  }
 </script>
 </body></html>

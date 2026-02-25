@@ -34,23 +34,8 @@
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
 <div class="relative flex min-h-screen flex-col">
 <!-- Top Navigation Bar -->
-<header class="flex items-center justify-between whitespace-nowrap border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 lg:px-20 py-3 sticky top-0 z-50">
-  <div class="flex items-center gap-8">
-    <div class="flex items-center gap-2 text-primary">
-      <div class="size-8 flex items-center justify-center">
-        <span class="material-symbols-outlined text-3xl">shopping_basket</span>
-      </div>
-      <h2 class="text-slate-900 dark:text-slate-100 text-xl font-bold leading-tight tracking-tight">ShopEase</h2>
-    </div>
-    <div class="hidden md:flex items-center gap-6">
-      <a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="index.html">Home</a>
-      <a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="products.html">Products</a>
-    </div>
-  </div>
-  <div class="flex items-center gap-4">
-    <a href="register.html" class="flex items-center justify-center rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold transition-opacity hover:opacity-90">Sign Up</a>
-  </div>
-</header>
+<!-- Navigation -->
+<div id="navbar-placeholder"></div>
 
 <main class="flex-grow flex items-center justify-center px-4 py-12 lg:py-20">
   <div class="w-full max-w-[480px] space-y-8 bg-white dark:bg-slate-900 p-8 lg:p-12 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800">
@@ -105,26 +90,22 @@
 </main>
 
 <!-- Footer -->
-<footer class="py-10 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-  <div class="container mx-auto px-6 text-center">
-    <div class="flex justify-center gap-8 mb-6">
-      <a class="text-slate-400 hover:text-primary transition-colors text-sm" href="#">Privacy Policy</a>
-      <a class="text-slate-400 hover:text-primary transition-colors text-sm" href="#">Terms of Service</a>
-      <a class="text-slate-400 hover:text-primary transition-colors text-sm" href="#">Help Center</a>
-    </div>
-    <p class="text-slate-400 text-xs tracking-wide">© 2024 ShopEase Inc. All rights reserved.</p>
-  </div>
-</footer>
+<div id="footer-placeholder"></div>
 </div>
 
 <script src="js/utils.js"></script>
 <script src="js/api.js"></script>
+<script src="js/router.js"></script>
+<script src="js/navbar.js"></script>
+<script src="js/footer.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    // Redirect if already logged in
-    if (localStorage.getItem('token')) {
-      window.location.href = 'index.html';
-    }
+    initPage(() => {
+        setupLoginHandlers();
+    });
+  });
+
+  function setupLoginHandlers() {
 
     // Password visibility toggle
     document.getElementById('toggle-password').addEventListener('click', () => {
@@ -155,7 +136,9 @@
         const response = await api.post('/api/login', { email, password });
         localStorage.setItem('token', response.access_token);
         localStorage.setItem('user', JSON.stringify(response.user));
-        window.location.href = 'index.html';
+        
+        const redirect = router.getValidatedRedirect();
+        router.navigate(redirect || 'index.html');
       } catch (error) {
         errText.textContent = error.message || 'Invalid email or password. Please try again.';
         errBox.style.display = 'flex';
@@ -163,6 +146,6 @@
         btn.textContent = 'Sign In';
       }
     });
-  });
+  }
 </script>
 </body></html>

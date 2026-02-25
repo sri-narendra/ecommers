@@ -26,29 +26,14 @@
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display transition-colors duration-200">
 <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
-<div class="layout-container flex h-full grow flex-col">
-<!-- Top Navigation -->
-<header class="flex items-center justify-between whitespace-nowrap border-b border-primary/10 bg-white dark:bg-background-dark px-6 md:px-20 py-3 sticky top-0 z-50">
-  <div class="flex items-center gap-8">
-    <div class="flex items-center gap-3 text-primary">
-      <span class="material-symbols-outlined text-3xl">local_shipping</span>
-      <h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight">ShopEase Admin</h2>
-    </div>
-  </div>
-  <div class="flex flex-1 justify-end gap-6 items-center">
-    <nav class="hidden lg:flex items-center gap-6">
-      <a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="admin.html">Dashboard</a>
-      <a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="admin-products.html">Inventory</a>
-      <a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="admin-orders.html">Orders</a>
-      <a class="text-primary text-sm font-bold border-b-2 border-primary pb-1" href="admin-deliveries.html">Deliveries</a>
-    </nav>
-    <button onclick="logout()" class="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
-      <span class="material-symbols-outlined">logout</span>Logout
-    </button>
-  </div>
-</header>
+<!-- Admin Header -->
+<div id="admin-header-placeholder"></div>
 
-<main class="flex-1 flex flex-col max-w-7xl mx-auto w-full px-6 md:px-20 py-8">
+<div class="flex flex-1">
+  <!-- Admin Sidebar -->
+  <div id="admin-sidebar-placeholder"></div>
+
+  <main class="flex-1 overflow-y-auto p-8">
   <!-- Page Header -->
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
     <div>
@@ -131,17 +116,15 @@
   </div>
 </main>
 
-<footer class="mt-auto border-t border-primary/10 bg-white dark:bg-slate-950 px-6 md:px-20 py-6">
-  <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-    <span class="text-xs font-medium text-slate-400">© 2024 ShopEase Admin. All rights reserved.</span>
-    <a class="text-xs font-medium text-slate-500 hover:text-primary" href="index.html">Back to Store</a>
-  </div>
-</footer>
+<!-- Footer -->
+<div id="footer-placeholder"></div>
 </div>
 </div>
 
 <script src="js/utils.js"></script>
 <script src="js/api.js"></script>
+<script src="js/router.js"></script>
+<script src="js/admin-layout.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/admin.js"></script>
 <script>
@@ -156,9 +139,10 @@
   };
 
   document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('token');
-    if (!token) { window.location.href = 'login.html'; return; }
-    loadDeliveries();
+    initPage(async () => {
+        adminLayout.render();
+        await loadDeliveries();
+    });
   });
 
   async function loadDeliveries() {
@@ -239,6 +223,10 @@
     } catch (err) { alert('Error updating delivery: ' + err.message); }
   }
 
-  function logout() { localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href = 'login.html'; }
+  function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+        api.logout();
+    }
+  }
 </script>
 </body></html>

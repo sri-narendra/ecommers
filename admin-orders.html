@@ -27,51 +27,14 @@
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
 <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
 <div class="layout-container flex h-full grow flex-col">
-<!-- Top Navigation -->
-<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-10 py-3 sticky top-0 z-50">
-  <div class="flex items-center gap-8">
-    <div class="flex items-center gap-4 text-primary">
-      <div class="size-8 flex items-center justify-center bg-primary/10 rounded-lg">
-        <span class="material-symbols-outlined text-primary">shopping_bag</span>
-      </div>
-      <h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight">ShopEase Admin</h2>
-    </div>
-  </div>
-  <nav class="hidden md:flex items-center gap-8">
-    <a class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="admin.html">Dashboard</a>
-    <a class="text-primary text-sm font-semibold border-b-2 border-primary py-1" href="admin-orders.html">Orders</a>
-    <a class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="admin-products.html">Products</a>
-    <a class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="admin-deliveries.html">Deliveries</a>
-  </nav>
-  <button onclick="logout()" class="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
-    <span class="material-symbols-outlined">logout</span>Logout
-  </button>
-</header>
+<!-- Admin Header -->
+<div id="admin-header-placeholder"></div>
+
+<div class="flex flex-1">
+  <!-- Admin Sidebar -->
+  <div id="admin-sidebar-placeholder"></div>
 
 <main class="flex-1 flex overflow-hidden">
-  <!-- Sidebar -->
-  <aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 hidden lg:flex flex-col gap-8">
-    <div class="flex flex-col gap-2">
-      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest px-3 mb-2">Management</h3>
-      <a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-primary/5 hover:text-primary rounded-lg transition-all" href="admin.html">
-        <span class="material-symbols-outlined">dashboard</span><span class="text-sm font-semibold">Overview</span>
-      </a>
-      <a class="flex items-center gap-3 px-3 py-2.5 bg-primary/10 text-primary rounded-lg" href="admin-orders.html">
-        <span class="material-symbols-outlined">receipt_long</span><span class="text-sm font-semibold">Orders</span>
-      </a>
-      <a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-primary/5 hover:text-primary rounded-lg transition-all" href="admin-products.html">
-        <span class="material-symbols-outlined">inventory_2</span><span class="text-sm font-semibold">Inventory</span>
-      </a>
-      <a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-primary/5 hover:text-primary rounded-lg transition-all" href="admin-deliveries.html">
-        <span class="material-symbols-outlined">local_shipping</span><span class="text-sm font-semibold">Deliveries</span>
-      </a>
-    </div>
-    <div class="mt-auto">
-      <a href="index.html" class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-primary transition-colors">
-        <span class="material-symbols-outlined">storefront</span><span class="text-sm font-medium">View Store</span>
-      </a>
-    </div>
-  </aside>
 
   <!-- Content -->
   <section class="flex-1 flex flex-col min-w-0 bg-slate-50 dark:bg-slate-950">
@@ -124,6 +87,8 @@
 
 <script src="js/utils.js"></script>
 <script src="js/api.js"></script>
+<script src="js/router.js"></script>
+<script src="js/admin-layout.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/admin.js"></script>
 <script>
@@ -138,9 +103,10 @@
   };
 
   document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('token');
-    if (!token) { window.location.href = 'login.html'; return; }
-    loadOrders();
+    initPage(async () => {
+        adminLayout.render();
+        await loadOrders();
+    });
   });
 
   async function loadOrders() {
@@ -215,9 +181,9 @@
   }
 
   function logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.location.href = 'login.html';
+    if (confirm('Are you sure you want to logout?')) {
+        api.logout();
+    }
   }
 </script>
 </body></html>

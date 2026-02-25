@@ -32,32 +32,8 @@
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
 <!-- Navigation Bar -->
-<nav class="sticky top-0 z-50 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between h-16 items-center">
-      <div class="flex items-center gap-8">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 bg-primary rounded flex items-center justify-center">
-            <span class="material-icons text-white text-lg">shopping_bag</span>
-          </div>
-          <a href="index.html" class="font-bold text-xl tracking-tight text-primary">ShopEase</a>
-        </div>
-        <div class="hidden md:flex gap-6 text-sm font-medium text-slate-600 dark:text-slate-400">
-          <a class="hover:text-primary transition-colors" href="index.html">Home</a>
-          <a class="hover:text-primary transition-colors" href="products.html">Products</a>
-        </div>
-      </div>
-      <div class="flex items-center gap-4">
-        <a href="cart.html" class="p-2 text-slate-500 hover:text-primary transition-colors relative">
-          <span class="material-icons">shopping_cart</span>
-        </a>
-        <button onclick="logout()" class="p-2 text-red-500 hover:text-red-700 transition-colors flex items-center gap-1 text-sm font-medium">
-          <span class="material-icons text-sm">logout</span> Logout
-        </button>
-      </div>
-    </div>
-  </div>
-</nav>
+<!-- Navigation -->
+<div id="navbar-placeholder"></div>
 
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <!-- Profile Header -->
@@ -210,14 +186,14 @@
   </div>
 </main>
 
-<footer class="mt-12 py-8 border-t border-primary/10">
-  <div class="max-w-7xl mx-auto px-4 text-center">
-    <p class="text-slate-400 text-sm">© 2024 ShopEase. All rights reserved.</p>
-  </div>
-</footer>
+<!-- Footer -->
+<div id="footer-placeholder"></div>
 
 <script src="js/utils.js"></script>
 <script src="js/api.js"></script>
+<script src="js/router.js"></script>
+<script src="js/navbar.js"></script>
+<script src="js/footer.js"></script>
 <script src="js/auth.js"></script>
 <script>
   const statusStyles = {
@@ -229,13 +205,13 @@
   };
 
   document.addEventListener('DOMContentLoaded', () => {
-    loadProfile();
+    initPage(async () => {
+        await loadProfile();
+    });
   });
 
   async function loadProfile() {
-    const loading = document.getElementById('profile-loading');
     const content = document.getElementById('profile-content-area');
-    loading.style.display = 'flex';
     content.style.display = 'none';
 
     try {
@@ -248,13 +224,11 @@
       document.getElementById('user-joined').textContent = new Date(user.created_at).toLocaleDateString('en-US', {year:'numeric', month:'long'});
 
       await loadOrders();
-
-      loading.style.display = 'none';
       content.style.display = 'block';
     } catch (err) {
-      loading.style.display = 'none';
-      if (err.status === 401) window.location.href = 'login.html';
-      else alert('Error loading profile: ' + err.message);
+      console.error('Profile load error:', err);
+      if (err.status === 401) router.navigate('login.html');
+      else showToast('Error loading profile: ' + err.message, 'error');
     }
   }
 
@@ -332,9 +306,7 @@
 
   function logout() {
     if (confirm('Are you sure you want to logout?')) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = 'index.html';
+        api.logout();
     }
   }
 </script>

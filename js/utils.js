@@ -201,25 +201,78 @@ function getUser() {
 // Check if user is admin
 function isAdmin() {
     const user = getUser();
-    return user && user.role === 'admin';
+    const token = localStorage.getItem('token');
+    return !!token && user && user.role === 'admin';
 }
 
 // Redirect to login if not authenticated
 function requireAuth() {
     if (!isAuthenticated()) {
-        window.location.href = 'login.html';
+        router.navigate('login.html', { redirect: router.getCurrentPage() });
         return false;
     }
+    // Revalidate token on every load (Back Button Cache protection)
+    api.getProfile().catch(() => {
+        api.clearToken();
+        router.navigate('login.html');
+    });
     return true;
 }
 
 // Redirect to home if already authenticated
 function preventAuth() {
     if (isAuthenticated()) {
-        window.location.href = 'index.html';
+        router.navigate('index.html');
         return false;
     }
     return true;
+}
+
+/**
+ * Global Loader Management
+ */
+function showLoader() {
+    let loader = document.getElementById('global-loader');
+    if (!loader) {
+        loader = document.createElement('div');
+        loader.id = 'global-loader';
+        loader.innerHTML = `
+            <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
+                <div class="flex flex-col items-center gap-4">
+                    <div class="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+                    <p class="text-sm font-bold text-slate-600 dark:text-slate-400">Loading...</p>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(loader);
+    }
+    loader.classList.remove('hidden');
+}
+
+function hideLoader() {
+    const loader = document.getElementById('global-loader');
+    if (loader) {
+        loader.classList.add('hidden');
+    }
+}
+
+/**
+ * Page Initialization Wrapper
+ * Pattern: Show Loader -> Check Guard -> Init Page -> Hide Loader
+ */
+async function initPage(pageInitFunc) {
+    showLoader();
+    try {
+        const passedGuard = await router.checkGuard();
+        if (passedGuard && pageInitFunc) {
+            await pageInitFunc();
+        }
+    } catch (error) {
+        console.error('Page initialization failed:', error);
+        showToast('Error loading page. Please refresh.', 'error');
+    } finally {
+        hideLoader();
+    }
 }
 
 // Format product category

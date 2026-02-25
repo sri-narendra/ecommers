@@ -26,31 +26,8 @@
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
 <div class="flex flex-col min-h-screen">
-<header class="sticky top-0 z-50 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 md:px-10 lg:px-20 py-3">
-  <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
-    <div class="flex items-center gap-8">
-      <div class="flex items-center gap-2 text-primary">
-        <span class="material-symbols-outlined text-3xl">shopping_bag</span>
-        <a href="index.html"><h2 class="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-tight font-display">ShopEase</h2></a>
-      </div>
-      <nav class="hidden md:flex items-center gap-6">
-        <a class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="index.html">Home</a>
-        <a class="text-primary text-sm font-bold border-b-2 border-primary pb-1" href="products.html">Products</a>
-        <a class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="cart.html">Cart</a>
-      </nav>
-    </div>
-    <div class="flex flex-1 justify-end items-center gap-4">
-      <div class="hidden lg:flex relative w-full max-w-xs">
-        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">search</span>
-        <input id="search-input" class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/50 text-slate-900 dark:text-white" placeholder="Search products..." type="text"/>
-      </div>
-      <a href="cart.html" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-primary/10 hover:text-primary transition-colors relative">
-        <span class="material-symbols-outlined">shopping_cart</span>
-      </a>
-      <div id="auth-nav"></div>
-    </div>
-  </div>
-</header>
+<!-- Navigation -->
+<div id="navbar-placeholder"></div>
 
 <main class="max-w-7xl mx-auto w-full flex flex-col md:flex-row gap-8 px-4 md:px-10 lg:px-20 py-8 flex-grow">
   <!-- Left Sidebar Filters -->
@@ -100,55 +77,41 @@
   </section>
 </main>
 
-<footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-10 px-4 md:px-10 lg:px-20 mt-auto">
-  <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-    <div class="flex items-center gap-2 text-primary">
-      <span class="material-symbols-outlined text-2xl">shopping_bag</span>
-      <h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight">ShopEase</h2>
-    </div>
-    <p class="text-slate-500 text-sm">© 2024 ShopEase E-commerce. All rights reserved.</p>
-  </div>
-</footer>
+<!-- Footer -->
+<div id="footer-placeholder"></div>
 </div>
 
 <script src="js/utils.js"></script>
 <script src="js/api.js"></script>
+<script src="js/router.js"></script>
+<script src="js/navbar.js"></script>
+<script src="js/footer.js"></script>
 <script src="js/auth.js"></script>
 <script>
-  const CATEGORY_ICONS = {
-    electronics: 'devices', technology: 'laptop_mac', tech: 'devices',
-    clothing: 'checkroom', fashion: 'checkroom', apparel: 'checkroom', shoes: 'footprint',
-    home: 'chair', furniture: 'chair', living: 'home',
-    sports: 'fitness_center', sport: 'fitness_center', outdoor: 'park',
-    jewelry: 'diamond', accessories: 'watch',
-    books: 'menu_book', beauty: 'spa', food: 'restaurant',
-    toys: 'toys', games: 'sports_esports', health: 'health_and_safety',
-  };
-  function getCatIcon(cat) { return CATEGORY_ICONS[(cat||'').toLowerCase().trim()] || 'category'; }
-
-  let allProducts = [];
-  let currentCategory = '';
-  let currentSort = 'name';
-
+  // ... rest of the setup
   document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('token');
-    document.getElementById('auth-nav').innerHTML = token
-      ? `<a href="profile.html" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-primary/10 hover:text-primary transition-colors"><span class="material-symbols-outlined">person</span></a>`
-      : `<a href="login.html" class="flex cursor-pointer items-center justify-center rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all">Login</a>`;
+    initPage(async () => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('category')) currentCategory = params.get('category');
+        if (params.get('search')) {
+            const query = params.get('search');
+            document.getElementById('search-input-mock')?.value = query; // Sync search if possible
+        }
+        await loadProducts();
 
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('category')) currentCategory = params.get('category');
-    loadProducts();
-
-    document.getElementById('search-input').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') searchProducts();
+        const globalSearch = document.getElementById('search-input');
+        if (globalSearch) {
+            globalSearch.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') searchProducts();
+            });
+        }
     });
   });
 
   async function loadProducts() {
     try {
       const response = await api.get('/api/products');
-      allProducts = response.data.products;
+      allProducts = response.products || [];
       buildCategorySidebar(allProducts);
       applyFilters();
     } catch (error) {
@@ -191,7 +154,7 @@
     }
     noProducts.classList.add('hidden');
     grid.innerHTML = products.map(product => `
-      <div class="bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-shadow group cursor-pointer" onclick="window.location.href='product-details.html?id=${product._id}'">
+      <div class="bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-shadow group cursor-pointer" onclick="router.navigate('product-details.html', { id: '${product._id}' })">
         <div class="relative aspect-[4/3] overflow-hidden">
           ${product.stock < 5 ? '<div class="absolute top-2 left-2 z-10"><span class="bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">Low Stock</span></div>' : ''}
           <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="${product.image_url || 'https://placehold.co/400x300/e2e8f0/94a3b8?text=' + encodeURIComponent(product.name)}" alt="${product.name}"/>
@@ -206,7 +169,7 @@
             <button onclick="event.stopPropagation(); addToCartInline('${product._id}', 1, this)" class="flex-1 bg-primary text-white py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
               <span class="material-symbols-outlined text-lg">shopping_cart</span>Add to Cart
             </button>
-            <button onclick="event.stopPropagation(); window.location.href='product-details.html?id=${product._id}'" class="px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+            <button onclick="event.stopPropagation(); router.navigate('product-details.html', { id: '${product._id}' })" class="px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
               <span class="material-symbols-outlined text-lg">visibility</span>
             </button>
           </div>
@@ -218,10 +181,19 @@
   async function addToCartInline(productId, quantity, btn) {
     try {
       await api.post('/api/products/' + productId + '/add-to-cart', { quantity });
-      if (btn) { btn.innerHTML = '<span class="material-symbols-outlined text-lg">check</span>Added!'; setTimeout(() => { btn.innerHTML = '<span class="material-symbols-outlined text-lg">shopping_cart</span>Add to Cart'; }, 1500); }
+      showToast('Added to cart!', 'success');
+      if (btn) { 
+        const original = btn.innerHTML;
+        btn.innerHTML = '<span class="material-symbols-outlined text-lg">check</span>Added!'; 
+        setTimeout(() => { btn.innerHTML = original; }, 1500); 
+      }
+      if (window.updateCartBadge) window.updateCartBadge();
     } catch (error) {
-      if (error.status === 401) window.location.href = 'login.html';
-      else alert('Error adding to cart: ' + error.message);
+      if (error.status === 401) {
+          router.navigate('login.html', { redirect: 'products.html' });
+      } else {
+          showToast('Error: ' + error.message, 'error');
+      }
     }
   }
 

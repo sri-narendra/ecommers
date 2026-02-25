@@ -31,38 +31,7 @@
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
 <div class="relative flex min-h-screen flex-col">
 <!-- Navigation -->
-<header class="sticky top-0 z-50 w-full border-b border-primary/10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
-  <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-    <div class="flex items-center gap-10">
-      <a class="flex items-center gap-2" href="index.html">
-        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white">
-          <span class="material-symbols-outlined">shopping_bag</span>
-        </div>
-        <span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">ShopEase</span>
-      </a>
-      <nav class="hidden md:flex items-center gap-8">
-        <a class="text-sm font-semibold text-primary" href="index.html">Home</a>
-        <a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors" href="products.html">Shop</a>
-        <a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors" href="cart.html">Cart</a>
-      </nav>
-    </div>
-    <div class="flex flex-1 justify-end items-center gap-6">
-      <div class="relative hidden lg:block w-full max-w-xs">
-        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-          <span class="material-symbols-outlined text-[20px]">search</span>
-        </span>
-        <input class="h-10 w-full rounded-full border-none bg-primary/5 pl-10 text-sm focus:ring-2 focus:ring-primary/20 placeholder:text-slate-400" placeholder="Search products..." type="text" id="header-search"/>
-      </div>
-      <div class="flex items-center gap-3">
-        <a href="cart.html" class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/5 hover:bg-primary/10 text-slate-700 dark:text-slate-200 transition-colors relative">
-          <span class="material-symbols-outlined">shopping_cart</span>
-          <span id="cart-badge" class="absolute -top-1 -right-1 hidden flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">0</span>
-        </a>
-        <div id="auth-nav-home"></div>
-      </div>
-    </div>
-  </div>
-</header>
+<div id="navbar-placeholder"></div>
 
 <main class="flex-grow">
   <!-- Hero Section -->
@@ -143,79 +112,23 @@
 </main>
 
 <!-- Footer -->
-<footer class="bg-slate-900 text-white">
-  <div class="mx-auto max-w-7xl border-b border-slate-800 px-6 py-16">
-    <div class="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center">
-      <div>
-        <h2 class="text-3xl font-extrabold">Join our community</h2>
-        <p class="mt-4 text-slate-400 max-w-md">Subscribe to our newsletter for early access to new collections and exclusive discounts.</p>
-      </div>
-      <div>
-        <form class="flex w-full max-w-md flex-col gap-3 sm:flex-row lg:ml-auto">
-          <input class="h-12 flex-1 rounded-lg border-none bg-slate-800 px-4 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-primary" placeholder="Enter your email" type="email"/>
-          <button class="h-12 rounded-lg bg-primary px-8 font-bold hover:bg-primary/90 transition-all" type="submit">Subscribe</button>
-        </form>
-      </div>
-    </div>
-  </div>
-  <div class="mx-auto max-w-7xl px-6 py-16">
-    <div class="grid grid-cols-2 gap-12 md:grid-cols-4">
-      <div class="col-span-2 md:col-span-1">
-        <div class="flex items-center gap-2 mb-6">
-          <div class="flex h-8 w-8 items-center justify-center rounded bg-primary text-white">
-            <span class="material-symbols-outlined text-[18px]">shopping_bag</span>
-          </div>
-          <span class="text-xl font-bold tracking-tight">ShopEase</span>
-        </div>
-        <p class="text-sm text-slate-400 leading-relaxed">Redefining modern retail with quality, accessibility, and style.</p>
-      </div>
-      <div>
-        <h4 class="mb-6 text-sm font-bold uppercase tracking-widest text-slate-500">Shop</h4>
-        <ul class="flex flex-col gap-4 text-sm text-slate-400">
-          <li><a class="hover:text-primary transition-colors" href="products.html">All Products</a></li>
-          <li><a class="hover:text-primary transition-colors" href="#">New Arrivals</a></li>
-          <li><a class="hover:text-primary transition-colors" href="#">Sale</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="mb-6 text-sm font-bold uppercase tracking-widest text-slate-500">Account</h4>
-        <ul class="flex flex-col gap-4 text-sm text-slate-400">
-          <li><a class="hover:text-primary transition-colors" href="login.html">Login</a></li>
-          <li><a class="hover:text-primary transition-colors" href="register.html">Register</a></li>
-          <li><a class="hover:text-primary transition-colors" href="profile.html">My Profile</a></li>
-          <li><a class="hover:text-primary transition-colors" href="cart.html">My Cart</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="mb-6 text-sm font-bold uppercase tracking-widest text-slate-500">Legal</h4>
-        <ul class="flex flex-col gap-4 text-sm text-slate-400">
-          <li><a class="hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
-          <li><a class="hover:text-primary transition-colors" href="#">Terms of Service</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="mt-16 border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
-      <p class="text-xs text-slate-500">© 2024 ShopEase Inc. All rights reserved.</p>
-    </div>
-  </div>
-</footer>
+<div id="footer-placeholder"></div>
 </div>
 
 <script src="js/utils.js"></script>
 <script src="js/api.js"></script>
+<script src="js/router.js"></script>
+<script src="js/navbar.js"></script>
+<script src="js/footer.js"></script>
 <script src="js/auth.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    // Auth nav
-    const token = localStorage.getItem('token');
-    const authDiv = document.getElementById('auth-nav-home');
-    if (token) {
-      authDiv.innerHTML = `<a href="profile.html" class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/5 hover:bg-primary/10 text-slate-700 dark:text-slate-200 transition-colors"><span class="material-symbols-outlined">person</span></a>`;
-    } else {
-      authDiv.innerHTML = `<a href="login.html" class="flex cursor-pointer items-center justify-center rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all">Login</a>`;
-    }
-    loadFeaturedProducts();
-    loadCategories();
+    initPage(async () => {
+        await Promise.all([
+            loadFeaturedProducts(),
+            loadCategories()
+        ]);
+    });
   });
 
   // Maps category names to material icons
@@ -265,7 +178,7 @@
         return;
       }
       grid.innerHTML = products.map(p => `
-        <div class="group relative flex flex-col gap-4 cursor-pointer" onclick="window.location.href='product-details.html?id=${p._id}'">
+        <div class="group relative flex flex-col gap-4 cursor-pointer" onclick="router.navigate('product-details.html', { id: '${p._id || p.id}' })">
           <div class="relative overflow-hidden rounded-xl bg-slate-100 aspect-square">
             <img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" src="${p.image_url || 'https://placehold.co/400x400/e2e8f0/94a3b8?text=' + encodeURIComponent(p.name)}" alt="${p.name}"/>
             <button onclick="event.stopPropagation(); addToCart('${p._id}', 1)" class="absolute bottom-4 left-4 right-4 translate-y-12 bg-primary py-3 text-sm font-bold text-white opacity-0 backdrop-blur transition-all group-hover:translate-y-0 group-hover:opacity-100 rounded-lg">Add to Cart</button>
@@ -285,12 +198,16 @@
   async function addToCart(productId, quantity) {
     try {
       await api.post('/api/products/' + productId + '/add-to-cart', { quantity });
-      const badge = document.getElementById('cart-badge');
-      badge.classList.remove('hidden');
-      badge.textContent = (parseInt(badge.textContent) || 0) + 1;
+      showToast('Added to cart!', 'success');
+      // No need to manually update badge, navbar.js should handle it (if implemented that way)
+      // or we can reload navbar
+      if (window.updateCartBadge) window.updateCartBadge();
     } catch (error) {
-      if (error.status === 401) window.location.href = 'login.html';
-      else alert('Error adding to cart: ' + error.message);
+      if (error.status === 401) {
+          router.navigate('login.html', { redirect: 'index.html' });
+      } else {
+          showToast('Error adding to cart: ' + error.message, 'error');
+      }
     }
   }
 </script>

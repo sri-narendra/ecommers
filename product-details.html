@@ -26,27 +26,8 @@
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
 <div class="relative flex min-h-screen flex-col">
-<header class="sticky top-0 z-50 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-10 py-3">
-  <div class="max-w-7xl mx-auto flex items-center justify-between">
-    <div class="flex items-center gap-8">
-      <div class="flex items-center gap-2 text-primary">
-        <span class="material-symbols-outlined text-3xl">shopping_bag</span>
-        <a href="index.html"><h2 class="text-slate-900 dark:text-white text-xl font-bold">ShopEase</h2></a>
-      </div>
-      <nav class="hidden md:flex items-center gap-7">
-        <a href="index.html" class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary">Home</a>
-        <a href="products.html" class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary">Products</a>
-        <a href="cart.html" class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary">Cart</a>
-      </nav>
-    </div>
-    <div class="flex items-center gap-3">
-      <a href="cart.html" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-primary transition-colors">
-        <span class="material-symbols-outlined">shopping_cart</span>
-      </a>
-      <div id="auth-nav"></div>
-    </div>
-  </div>
-</header>
+<!-- Navigation -->
+<div id="navbar-placeholder"></div>
 
 <main class="max-w-7xl mx-auto w-full px-6 py-8 flex-grow">
   <nav class="flex items-center gap-2 text-sm text-slate-500 mb-8">
@@ -119,7 +100,7 @@
             <span class="material-symbols-outlined">shopping_cart</span>
             Add to Cart
           </button>
-          <button onclick="window.location.href='products.html'" class="flex items-center justify-center gap-2 px-6 py-4 border-2 border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-700 dark:text-slate-200 hover:border-primary hover:text-primary transition-all">
+          <button onclick="router.navigate('products.html')" class="flex items-center justify-center gap-2 px-6 py-4 border-2 border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-700 dark:text-slate-200 hover:border-primary hover:text-primary transition-all">
             <span class="material-symbols-outlined">arrow_back</span>
             Back
           </button>
@@ -144,29 +125,23 @@
   </div>
 </main>
 
-<footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-8 px-6 mt-auto">
-  <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-    <div class="flex items-center gap-2 text-primary">
-      <span class="material-symbols-outlined">shopping_bag</span>
-      <span class="font-bold text-slate-900 dark:text-white">ShopEase</span>
-    </div>
-    <p class="text-xs text-slate-500">© 2024 ShopEase E-commerce. All rights reserved.</p>
-  </div>
-</footer>
+<!-- Footer -->
+<div id="footer-placeholder"></div>
 </div>
 
 <script src="js/utils.js"></script>
 <script src="js/api.js"></script>
+<script src="js/router.js"></script>
+<script src="js/navbar.js"></script>
+<script src="js/footer.js"></script>
 <script src="js/auth.js"></script>
 <script>
   let currentProductId = null;
 
   document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('token');
-    document.getElementById('auth-nav').innerHTML = token
-      ? `<a href="profile.html" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-primary transition-colors"><span class="material-symbols-outlined">person</span></a>`
-      : `<a href="login.html" class="flex items-center justify-center rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold hover:bg-primary/90">Login</a>`;
-    loadProductDetails();
+    initPage(async () => {
+        await loadProductDetails();
+    });
   });
 
   function getProductIdFromUrl() {
@@ -175,13 +150,11 @@
 
   async function loadProductDetails() {
     const productId = getProductIdFromUrl();
-    const loading = document.getElementById('product-loading');
     const content = document.getElementById('product-content');
     const notFound = document.getElementById('product-not-found');
 
     if (!productId) {
-      loading.style.display = 'none';
-      notFound.classList.remove('hidden');
+      router.navigate('products.html');
       return;
     }
 
@@ -195,7 +168,7 @@
       document.getElementById('product-price').textContent = '$' + product.price.toFixed(2);
       document.getElementById('product-description').textContent = product.description || '';
       document.getElementById('product-stock-text').textContent = `${product.stock} units available`;
-      document.getElementById('product-category').textContent = product.category || '';
+      document.getElementById('product-category').textContent = formatCategory(product.category);
       document.getElementById('breadcrumb-name').textContent = product.name;
       document.title = product.name + ' - ShopEase';
 
@@ -206,11 +179,14 @@
         document.getElementById('low-stock-warning').classList.remove('hidden');
       }
 
-      loading.style.display = 'none';
       content.classList.remove('hidden');
     } catch (error) {
-      loading.style.display = 'none';
+      console.error('Failed to load product:', error);
       notFound.classList.remove('hidden');
+      // Show error for 2s then redirect
+      setTimeout(() => {
+          router.navigate('products.html');
+      }, 2000);
     }
   }
 
@@ -242,8 +218,8 @@
     } catch (error) {
       btn.disabled = false;
       btn.innerHTML = '<span class="material-symbols-outlined">shopping_cart</span> Add to Cart';
-      if (error.status === 401) window.location.href = 'login.html';
-      else alert('Error: ' + (error.message || 'Could not add to cart.'));
+      if (error.status === 401) router.navigate('login.html', { redirect: 'product-details.html?id=' + currentProductId });
+      else showToast(error.message || 'Could not add to cart.', 'error');
     }
   }
 </script>

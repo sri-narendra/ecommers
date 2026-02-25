@@ -25,28 +25,8 @@
 </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
-<header class="sticky top-0 z-50 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-16">
-      <div class="flex items-center gap-8">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary text-3xl">shopping_bag</span>
-          <a href="index.html"><h1 class="text-xl font-bold tracking-tight">ShopEase</h1></a>
-        </div>
-      </div>
-      <nav class="hidden md:flex items-center gap-6">
-        <a class="text-sm font-medium hover:text-primary transition-colors" href="index.html">Home</a>
-        <a class="text-sm font-medium hover:text-primary transition-colors" href="products.html">Shop</a>
-        <a class="text-sm font-medium hover:text-primary transition-colors" href="cart.html">Cart</a>
-      </nav>
-      <div class="flex items-center gap-4">
-        <a href="cart.html" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors relative">
-          <span class="material-symbols-outlined">shopping_cart</span>
-        </a>
-      </div>
-    </div>
-  </div>
-</header>
+<!-- Navigation -->
+<div id="navbar-placeholder"></div>
 
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <nav class="flex items-center gap-2 text-sm text-slate-500 mb-8">
@@ -173,27 +153,24 @@
   </div>
 </main>
 
-<footer class="mt-20 border-t border-slate-200 dark:border-slate-800 py-8">
-  <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-8">
-    <div class="flex items-center gap-2 text-primary opacity-70">
-      <span class="material-symbols-outlined text-2xl">shopping_bag</span>
-      <span class="font-bold text-slate-900 dark:text-white">ShopEase</span>
-    </div>
-    <p class="text-sm text-slate-500">© 2024 ShopEase. All Rights Reserved.</p>
-  </div>
-</footer>
+<!-- Footer -->
+<div id="footer-placeholder"></div>
 
 <script src="js/utils.js"></script>
 <script src="js/api.js"></script>
+<script src="js/router.js"></script>
+<script src="js/navbar.js"></script>
+<script src="js/footer.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/checkout.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', async () => {
-    // Require login
-    const token = localStorage.getItem('token');
-    if (!token) { window.location.href = 'login.html'; return; }
+  document.addEventListener('DOMContentLoaded', () => {
+    initPage(async () => {
+        await loadCheckoutSummary();
+    });
+  });
 
-    const loading = document.getElementById('checkout-loading');
+  async function loadCheckoutSummary() {
     const empty = document.getElementById('checkout-empty');
     const content = document.getElementById('checkout-content');
 
@@ -201,9 +178,10 @@
       const res = await api.get('/api/cart');
       const items = res.cart?.items || res.items || [];
 
-      loading.style.display = 'none';
-
-      if (!items || items.length === 0) { empty.classList.remove('hidden'); return; }
+      if (!items || items.length === 0) { 
+          router.navigate('cart.html');
+          return; 
+      }
 
       content.classList.remove('hidden');
 
@@ -227,11 +205,10 @@
       document.getElementById('summary-subtotal').textContent = '$' + subtotal.toFixed(2);
       document.getElementById('summary-total').textContent = '$' + subtotal.toFixed(2);
     } catch (err) {
-      loading.style.display = 'none';
-      if (err.status === 401) window.location.href = 'login.html';
-      else empty.classList.remove('hidden');
+      if (err.status === 401) router.navigate('login.html', { redirect: 'checkout.html' });
+      else router.navigate('cart.html');
     }
-  });
+  }
 
   async function placeOrder() {
     const btn = document.getElementById('place-order-btn');
@@ -248,11 +225,11 @@
     btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Placing Order...';
 
     try {
-      await api.post('/api/checkout', {
+      const res = await api.post('/api/checkout', {
         shipping_address: { name: firstName + ' ' + lastName, address, city: document.getElementById('city').value, zip: document.getElementById('zip').value }
       });
       btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Order Placed!';
-      setTimeout(() => window.location.href = 'profile.html', 1500);
+      setTimeout(() => router.navigate('order-success.html', { orderId: res.order_id }), 1000);
     } catch (err) {
       btn.disabled = false;
       btn.innerHTML = '<span class="material-symbols-outlined">lock</span> Place Order';
