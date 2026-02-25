@@ -55,6 +55,10 @@ class APIClient {
         }
 
         if (!response.ok) {
+            // Handle unauthorized globally
+            if (response.status === 401) {
+                this.clearToken();
+            }
             const error = new Error(data.message || `HTTP error! status: ${response.status}`);
             error.status = response.status;
             error.response = data;
