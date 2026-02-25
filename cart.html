@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shopping Cart - ShopEase</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                fontFamily: { "display": ["Inter"] },
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+        },
+    }
+</script>
+<style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    body { font-family: 'Inter', sans-serif; }
+</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-10 py-3 sticky top-0 z-50">
+  <div class="flex items-center gap-8">
+    <div class="flex items-center gap-4 text-primary">
+      <span class="material-symbols-outlined text-3xl">shopping_bag</span>
+      <a href="index.html"><h2 class="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-[-0.015em]">ShopEase</h2></a>
+    </div>
+    <div class="hidden md:flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg px-3 py-1.5 w-64">
+      <span class="material-symbols-outlined text-slate-400 text-xl">search</span>
+      <input class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder-slate-400" placeholder="Search products..." type="text"/>
+    </div>
+  </div>
+  <div class="flex flex-1 justify-end gap-8">
+    <nav class="flex items-center gap-9">
+      <a class="text-slate-700 dark:text-slate-200 text-sm font-medium hover:text-primary transition-colors" href="index.html">Home</a>
+      <a class="text-slate-700 dark:text-slate-200 text-sm font-medium hover:text-primary transition-colors" href="products.html">Shop</a>
+      <a class="text-primary text-sm font-bold" href="cart.html">Cart</a>
+    </nav>
+    <div id="auth-cart"></div>
+  </div>
+</header>
+
+<main class="flex-1 max-w-[1280px] mx-auto w-full px-6 py-8">
+  <div class="flex flex-wrap gap-2 mb-6">
+    <a class="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary" href="index.html">Home</a>
+    <span class="text-slate-400 text-sm font-medium">/</span>
+    <span class="text-slate-900 dark:text-slate-100 text-sm font-medium">Shopping Cart</span>
+  </div>
+  <h1 class="text-slate-900 dark:text-white text-3xl font-black leading-tight tracking-tight mb-8">Shopping Cart</h1>
+
+  <div id="cart-loading" class="flex items-center justify-center py-16">
+    <span class="material-symbols-outlined text-primary text-5xl animate-spin">sync</span>
+  </div>
+
+  <div id="cart-empty" class="hidden text-center py-16">
+    <span class="material-symbols-outlined text-6xl text-slate-300">shopping_cart</span>
+    <p class="mt-4 text-xl font-bold text-slate-500">Your cart is empty</p>
+    <a href="products.html" class="mt-6 inline-block bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors">Start Shopping</a>
+  </div>
+
+  <div id="cart-content" class="hidden flex flex-col lg:flex-row gap-8">
+    <div class="flex-1">
+      <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+              <th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Product</th>
+              <th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Price</th>
+              <th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider text-center">Quantity</th>
+              <th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider text-right">Total</th>
+              <th class="px-6 py-4 w-16"></th>
+            </tr>
+          </thead>
+          <tbody id="cart-items" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody>
+        </table>
+      </div>
+      <div class="mt-6 flex items-center justify-between">
+        <a class="flex items-center gap-2 text-primary font-bold hover:underline" href="products.html">
+          <span class="material-symbols-outlined">arrow_back</span>Continue Shopping
+        </a>
+      </div>
+    </div>
+
+    <aside class="w-full lg:w-[380px]">
+      <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sticky top-24 shadow-sm">
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-6">Order Summary</h3>
+        <div class="space-y-4 mb-6">
+          <div class="flex justify-between text-slate-600 dark:text-slate-400">
+            <span class="text-sm">Subtotal</span>
+            <span id="subtotal" class="text-sm font-semibold text-slate-900 dark:text-white">$0.00</span>
+          </div>
+          <div class="flex justify-between text-slate-600 dark:text-slate-400">
+            <span class="text-sm">Shipping</span>
+            <span class="text-sm font-semibold text-green-600 dark:text-green-400">FREE</span>
+          </div>
+          <div class="pt-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-end">
+            <span class="text-base font-bold text-slate-900 dark:text-white">Total</span>
+            <span id="cart-total" class="text-2xl font-black text-primary">$0.00</span>
+          </div>
+        </div>
+        <a href="checkout.html" id="checkout-btn" class="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+          Proceed to Checkout
+          <span class="material-symbols-outlined">chevron_right</span>
+        </a>
+        <div class="mt-6 flex flex-col gap-3">
+          <div class="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+            <span class="material-symbols-outlined text-base">lock</span>Secure SSL encrypted payment
+          </div>
+          <div class="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+            <span class="material-symbols-outlined text-base">verified</span>30-day money back guarantee
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-12 px-6">
+  <div class="max-w-[1280px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+    <div class="flex items-center gap-2 text-primary">
+      <span class="material-symbols-outlined">shopping_bag</span>
+      <span class="font-bold text-slate-900 dark:text-white">ShopEase</span>
+    </div>
+    <p class="text-xs text-slate-500 dark:text-slate-400">© 2024 ShopEase E-commerce. All rights reserved.</p>
+  </div>
+</footer>
+</div>
+</div>
+
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/cart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    document.getElementById('auth-cart').innerHTML = token
+      ? `<a href="profile.html" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-primary/10 hover:text-primary transition-colors"><span class="material-symbols-outlined">person</span></a>`
+      : `<a href="login.html" class="flex cursor-pointer items-center justify-center rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all">Login</a>`;
+    loadCart();
+  });
+
+  async function loadCart() {
+    try {
+      const response = await api.get('/api/cart');
+      const items = response.cart?.items || response.items || [];
+      document.getElementById('cart-loading').style.display = 'none';
+
+      if (!items || items.length === 0) {
+        document.getElementById('cart-empty').classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('cart-content').classList.remove('hidden');
+      let subtotal = 0;
+      document.getElementById('cart-items').innerHTML = items.map(item => {
+        const price = item.product?.price || item.price || 0;
+        const qty = item.quantity || 1;
+        subtotal += price * qty;
+        return `<tr class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+          <td class="px-6 py-5">
+            <div class="flex items-center gap-4">
+              <div class="h-20 w-20 rounded-lg bg-slate-100 dark:bg-slate-800 flex-shrink-0 bg-center bg-cover border border-slate-200 dark:border-slate-700" style="background-image: url('${item.product?.image_url || ''}')"></div>
+              <div>
+                <p class="font-bold text-slate-900 dark:text-white">${item.product?.name || item.name || 'Product'}</p>
+                <p class="text-sm text-slate-500 dark:text-slate-400">${item.product?.category || ''}</p>
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-5 text-slate-700 dark:text-slate-300 font-medium">$${price.toFixed(2)}</td>
+          <td class="px-6 py-5">
+            <div class="flex items-center justify-center gap-1">
+              <button onclick="updateQty('${item.product?._id || item._id}', ${qty - 1})" class="w-8 h-8 flex items-center justify-center rounded-md border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+                <span class="material-symbols-outlined text-lg">remove</span>
+              </button>
+              <span class="w-12 text-center font-medium text-slate-900 dark:text-white">${qty}</span>
+              <button onclick="updateQty('${item.product?._id || item._id}', ${qty + 1})" class="w-8 h-8 flex items-center justify-center rounded-md border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+                <span class="material-symbols-outlined text-lg">add</span>
+              </button>
+            </div>
+          </td>
+          <td class="px-6 py-5 text-right font-bold text-slate-900 dark:text-white">$${(price * qty).toFixed(2)}</td>
+          <td class="px-6 py-5 text-center">
+            <button onclick="removeFromCart('${item.product?._id || item._id}')" class="text-slate-400 hover:text-red-500 transition-colors">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </td>
+        </tr>`;
+      }).join('');
+
+      document.getElementById('subtotal').textContent = '$' + subtotal.toFixed(2);
+      document.getElementById('cart-total').textContent = '$' + subtotal.toFixed(2);
+    } catch (err) {
+      document.getElementById('cart-loading').style.display = 'none';
+      if (err.status === 401) window.location.href = 'login.html';
+      else document.getElementById('cart-empty').classList.remove('hidden');
+    }
+  }
+
+  async function updateQty(productId, qty) {
+    if (qty < 1) { await removeFromCart(productId); return; }
+    try {
+      await api.put('/api/cart/' + productId, { quantity: qty });
+      loadCart();
+    } catch (err) { alert('Error: ' + err.message); }
+  }
+
+  async function removeFromCart(productId) {
+    try {
+      await api.delete('/api/cart/' + productId);
+      loadCart();
+    } catch (err) { alert('Error: ' + err.message); }
+  }
+</script>
+</body></html>

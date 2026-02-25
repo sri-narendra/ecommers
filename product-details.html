@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Product Details - ShopEase</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                fontFamily: { "display": ["Inter", "sans-serif"] },
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+        },
+    }
+</script>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex min-h-screen flex-col">
+<header class="sticky top-0 z-50 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-10 py-3">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-8">
+      <div class="flex items-center gap-2 text-primary">
+        <span class="material-symbols-outlined text-3xl">shopping_bag</span>
+        <a href="index.html"><h2 class="text-slate-900 dark:text-white text-xl font-bold">ShopEase</h2></a>
+      </div>
+      <nav class="hidden md:flex items-center gap-7">
+        <a href="index.html" class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary">Home</a>
+        <a href="products.html" class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary">Products</a>
+        <a href="cart.html" class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary">Cart</a>
+      </nav>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="cart.html" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-primary transition-colors">
+        <span class="material-symbols-outlined">shopping_cart</span>
+      </a>
+      <div id="auth-nav"></div>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto w-full px-6 py-8 flex-grow">
+  <nav class="flex items-center gap-2 text-sm text-slate-500 mb-8">
+    <a href="index.html" class="hover:text-primary">Home</a>
+    <span class="material-symbols-outlined text-xs">chevron_right</span>
+    <a href="products.html" class="hover:text-primary">Products</a>
+    <span class="material-symbols-outlined text-xs">chevron_right</span>
+    <span id="breadcrumb-name" class="text-slate-900 dark:text-slate-100 font-semibold">Loading...</span>
+  </nav>
+
+  <div id="product-loading" class="flex items-center justify-center py-24">
+    <span class="material-symbols-outlined text-primary text-6xl animate-spin">sync</span>
+  </div>
+
+  <div id="product-not-found" class="hidden text-center py-24">
+    <span class="material-symbols-outlined text-6xl text-slate-300">search_off</span>
+    <h2 class="mt-4 text-2xl font-bold text-slate-600 dark:text-slate-300">Product Not Found</h2>
+    <p class="mt-2 text-slate-400">The product you're looking for doesn't exist or has been removed.</p>
+    <a href="products.html" class="mt-6 inline-block bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors">Back to Products</a>
+  </div>
+
+  <div id="product-content" class="hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-20">
+      <!-- Image Gallery -->
+      <div class="space-y-4">
+        <div class="aspect-square rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+          <img id="product-image" src="" alt="Product Image" class="w-full h-full object-cover"/>
+        </div>
+      </div>
+
+      <!-- Product Info -->
+      <div class="flex flex-col justify-start">
+        <p id="product-category" class="text-sm font-bold tracking-widest uppercase text-primary mb-2"></p>
+        <h1 id="product-name" class="text-4xl font-black text-slate-900 dark:text-white leading-tight tracking-tight mb-4"></h1>
+        <div class="flex items-baseline gap-4 mb-6">
+          <span id="product-price" class="text-4xl font-black text-primary"></span>
+        </div>
+
+        <div id="low-stock-warning" class="hidden mb-4 flex items-center gap-2 text-sm font-bold text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-4 py-2 rounded-lg border border-amber-200 dark:border-amber-800">
+          <span class="material-symbols-outlined text-lg">warning</span>
+          Only a few items left in stock!
+        </div>
+
+        <p id="product-description" class="text-slate-600 dark:text-slate-400 text-base leading-relaxed mb-8"></p>
+
+        <div class="flex items-center gap-4 mb-2 text-sm text-slate-500 dark:text-slate-400">
+          <span class="material-symbols-outlined text-base">inventory_2</span>
+          <span id="product-stock-text"></span>
+        </div>
+
+        <!-- Quantity Selector -->
+        <div class="mb-8 mt-6">
+          <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wider">Quantity</label>
+          <div class="flex items-center gap-4">
+            <div class="flex items-center rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+              <button onclick="decrementQty()" class="h-12 w-12 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                <span class="material-symbols-outlined">remove</span>
+              </button>
+              <input type="number" id="quantity" value="1" min="1" max="99" class="w-16 h-12 text-center border-none bg-transparent focus:ring-0 text-lg font-bold text-slate-900 dark:text-white"/>
+              <button onclick="incrementQty()" class="h-12 w-12 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                <span class="material-symbols-outlined">add</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row gap-4">
+          <button id="add-to-cart-btn" onclick="addToCartFromPage()" class="flex-1 flex items-center justify-center gap-3 bg-primary text-white py-4 px-6 rounded-xl font-bold text-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 active:scale-95">
+            <span class="material-symbols-outlined">shopping_cart</span>
+            Add to Cart
+          </button>
+          <button onclick="window.location.href='products.html'" class="flex items-center justify-center gap-2 px-6 py-4 border-2 border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-700 dark:text-slate-200 hover:border-primary hover:text-primary transition-all">
+            <span class="material-symbols-outlined">arrow_back</span>
+            Back
+          </button>
+        </div>
+
+        <div class="mt-8 pt-8 border-t border-slate-200 dark:border-slate-700 grid grid-cols-3 gap-4">
+          <div class="flex flex-col items-center text-center gap-2">
+            <span class="material-symbols-outlined text-primary">local_shipping</span>
+            <span class="text-xs text-slate-500">Free Shipping</span>
+          </div>
+          <div class="flex flex-col items-center text-center gap-2">
+            <span class="material-symbols-outlined text-primary">verified</span>
+            <span class="text-xs text-slate-500">Genuine Products</span>
+          </div>
+          <div class="flex flex-col items-center text-center gap-2">
+            <span class="material-symbols-outlined text-primary">currency_exchange</span>
+            <span class="text-xs text-slate-500">Easy Returns</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-8 px-6 mt-auto">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+    <div class="flex items-center gap-2 text-primary">
+      <span class="material-symbols-outlined">shopping_bag</span>
+      <span class="font-bold text-slate-900 dark:text-white">ShopEase</span>
+    </div>
+    <p class="text-xs text-slate-500">© 2024 ShopEase E-commerce. All rights reserved.</p>
+  </div>
+</footer>
+</div>
+
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  let currentProductId = null;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    document.getElementById('auth-nav').innerHTML = token
+      ? `<a href="profile.html" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-primary transition-colors"><span class="material-symbols-outlined">person</span></a>`
+      : `<a href="login.html" class="flex items-center justify-center rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold hover:bg-primary/90">Login</a>`;
+    loadProductDetails();
+  });
+
+  function getProductIdFromUrl() {
+    return new URLSearchParams(window.location.search).get('id');
+  }
+
+  async function loadProductDetails() {
+    const productId = getProductIdFromUrl();
+    const loading = document.getElementById('product-loading');
+    const content = document.getElementById('product-content');
+    const notFound = document.getElementById('product-not-found');
+
+    if (!productId) {
+      loading.style.display = 'none';
+      notFound.classList.remove('hidden');
+      return;
+    }
+
+    try {
+      const response = await api.get('/api/products/' + productId);
+      const product = response.product;
+      currentProductId = productId;
+
+      document.getElementById('product-image').src = product.image_url || 'https://placehold.co/600x600/e2e8f0/94a3b8?text=' + encodeURIComponent(product.name);
+      document.getElementById('product-name').textContent = product.name;
+      document.getElementById('product-price').textContent = '$' + product.price.toFixed(2);
+      document.getElementById('product-description').textContent = product.description || '';
+      document.getElementById('product-stock-text').textContent = `${product.stock} units available`;
+      document.getElementById('product-category').textContent = product.category || '';
+      document.getElementById('breadcrumb-name').textContent = product.name;
+      document.title = product.name + ' - ShopEase';
+
+      const quantityInput = document.getElementById('quantity');
+      quantityInput.max = product.stock;
+
+      if (product.stock < 5) {
+        document.getElementById('low-stock-warning').classList.remove('hidden');
+      }
+
+      loading.style.display = 'none';
+      content.classList.remove('hidden');
+    } catch (error) {
+      loading.style.display = 'none';
+      notFound.classList.remove('hidden');
+    }
+  }
+
+  function decrementQty() {
+    const input = document.getElementById('quantity');
+    if (parseInt(input.value) > 1) input.value = parseInt(input.value) - 1;
+  }
+
+  function incrementQty() {
+    const input = document.getElementById('quantity');
+    const max = parseInt(input.max) || 99;
+    if (parseInt(input.value) < max) input.value = parseInt(input.value) + 1;
+  }
+
+  async function addToCartFromPage() {
+    const btn = document.getElementById('add-to-cart-btn');
+    const qty = parseInt(document.getElementById('quantity').value) || 1;
+    try {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Adding...';
+      await api.post('/api/products/' + currentProductId + '/add-to-cart', { quantity: qty });
+      btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Added to Cart!';
+      btn.className = btn.className.replace('bg-primary', 'bg-green-600');
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined">shopping_cart</span> Add to Cart';
+        btn.className = btn.className.replace('bg-green-600', 'bg-primary');
+      }, 2000);
+    } catch (error) {
+      btn.disabled = false;
+      btn.innerHTML = '<span class="material-symbols-outlined">shopping_cart</span> Add to Cart';
+      if (error.status === 401) window.location.href = 'login.html';
+      else alert('Error: ' + (error.message || 'Could not add to cart.'));
+    }
+  }
+</script>
+</body></html>

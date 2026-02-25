@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Products - ShopEase</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                fontFamily: { "display": ["Inter", "sans-serif"] },
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+        },
+    }
+</script>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="flex flex-col min-h-screen">
+<header class="sticky top-0 z-50 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 md:px-10 lg:px-20 py-3">
+  <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+    <div class="flex items-center gap-8">
+      <div class="flex items-center gap-2 text-primary">
+        <span class="material-symbols-outlined text-3xl">shopping_bag</span>
+        <a href="index.html"><h2 class="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-tight font-display">ShopEase</h2></a>
+      </div>
+      <nav class="hidden md:flex items-center gap-6">
+        <a class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="index.html">Home</a>
+        <a class="text-primary text-sm font-bold border-b-2 border-primary pb-1" href="products.html">Products</a>
+        <a class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="cart.html">Cart</a>
+      </nav>
+    </div>
+    <div class="flex flex-1 justify-end items-center gap-4">
+      <div class="hidden lg:flex relative w-full max-w-xs">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">search</span>
+        <input id="search-input" class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/50 text-slate-900 dark:text-white" placeholder="Search products..." type="text"/>
+      </div>
+      <a href="cart.html" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-primary/10 hover:text-primary transition-colors relative">
+        <span class="material-symbols-outlined">shopping_cart</span>
+      </a>
+      <div id="auth-nav"></div>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto w-full flex flex-col md:flex-row gap-8 px-4 md:px-10 lg:px-20 py-8 flex-grow">
+  <!-- Left Sidebar Filters -->
+  <aside class="w-full md:w-64 flex-shrink-0 space-y-8">
+    <div>
+      <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">filter_list</span>
+        Filters
+      </h3>
+      <div class="mb-6">
+        <h4 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Categories</h4>
+        <ul id="category-list" class="space-y-2">
+          <li><div class="text-slate-400 text-xs flex items-center gap-2"><span class="material-symbols-outlined text-sm animate-spin">sync</span>Loading...</div></li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Product Area -->
+  <section class="flex-1">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div>
+        <h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">All Products</h1>
+        <p id="product-count" class="text-slate-500 text-sm mt-1">Loading products...</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-sm text-slate-500 whitespace-nowrap">Sort by:</span>
+        <select id="sort-filter" onchange="sortProducts()" class="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-primary focus:border-primary py-2 px-4">
+          <option value="name">Name A-Z</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+          <option value="date">Newest First</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="col-span-full flex items-center justify-center py-16">
+        <span class="material-symbols-outlined text-primary text-5xl animate-spin">sync</span>
+      </div>
+    </div>
+    <div id="no-products" class="hidden col-span-full text-center py-16 text-slate-400">
+      <span class="material-symbols-outlined text-5xl">search_off</span>
+      <p class="mt-4">No products found.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-10 px-4 md:px-10 lg:px-20 mt-auto">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+    <div class="flex items-center gap-2 text-primary">
+      <span class="material-symbols-outlined text-2xl">shopping_bag</span>
+      <h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight">ShopEase</h2>
+    </div>
+    <p class="text-slate-500 text-sm">© 2024 ShopEase E-commerce. All rights reserved.</p>
+  </div>
+</footer>
+</div>
+
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  const CATEGORY_ICONS = {
+    electronics: 'devices', technology: 'laptop_mac', tech: 'devices',
+    clothing: 'checkroom', fashion: 'checkroom', apparel: 'checkroom', shoes: 'footprint',
+    home: 'chair', furniture: 'chair', living: 'home',
+    sports: 'fitness_center', sport: 'fitness_center', outdoor: 'park',
+    jewelry: 'diamond', accessories: 'watch',
+    books: 'menu_book', beauty: 'spa', food: 'restaurant',
+    toys: 'toys', games: 'sports_esports', health: 'health_and_safety',
+  };
+  function getCatIcon(cat) { return CATEGORY_ICONS[(cat||'').toLowerCase().trim()] || 'category'; }
+
+  let allProducts = [];
+  let currentCategory = '';
+  let currentSort = 'name';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    document.getElementById('auth-nav').innerHTML = token
+      ? `<a href="profile.html" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-primary/10 hover:text-primary transition-colors"><span class="material-symbols-outlined">person</span></a>`
+      : `<a href="login.html" class="flex cursor-pointer items-center justify-center rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all">Login</a>`;
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('category')) currentCategory = params.get('category');
+    loadProducts();
+
+    document.getElementById('search-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') searchProducts();
+    });
+  });
+
+  async function loadProducts() {
+    try {
+      const response = await api.get('/api/products');
+      allProducts = response.data.products;
+      buildCategorySidebar(allProducts);
+      applyFilters();
+    } catch (error) {
+      console.error('Failed to load products:', error);
+      document.getElementById('products-grid').innerHTML = '';
+      document.getElementById('no-products').classList.remove('hidden');
+    }
+  }
+
+  function buildCategorySidebar(products) {
+    const cats = [...new Set(products.map(p => p.category).filter(Boolean))];
+    const list = document.getElementById('category-list');
+    list.innerHTML = `
+      <li>
+        <button onclick="filterByCategory('')" class="flex items-center gap-2 w-full text-left py-1 font-bold ${!currentCategory ? 'text-primary' : 'text-slate-600 dark:text-slate-400 hover:text-primary transition-colors'}">
+          <span class="material-symbols-outlined text-lg">apps</span>All Products
+          <span class="ml-auto text-xs bg-primary/10 text-primary px-1.5 rounded">${products.length}</span>
+        </button>
+      </li>
+      ${cats.map(cat => {
+        const count = products.filter(p => p.category === cat).length;
+        return `<li>
+          <button onclick="filterByCategory('${cat}')" class="flex items-center gap-2 w-full text-left py-1 capitalize ${currentCategory === cat ? 'font-bold text-primary' : 'text-slate-600 dark:text-slate-400 hover:text-primary transition-colors'}">
+            <span class="material-symbols-outlined text-lg">${getCatIcon(cat)}</span>${cat}
+            <span class="ml-auto text-xs bg-slate-100 dark:bg-slate-800 px-1.5 rounded">${count}</span>
+          </button>
+        </li>`;
+      }).join('')}
+    `;
+  }
+
+  function displayProducts(products) {
+    const grid = document.getElementById('products-grid');
+    const noProducts = document.getElementById('no-products');
+    document.getElementById('product-count').textContent = `Showing ${products.length} result${products.length !== 1 ? 's' : ''}`;
+    if (products.length === 0) {
+      grid.innerHTML = '';
+      noProducts.classList.remove('hidden');
+      return;
+    }
+    noProducts.classList.add('hidden');
+    grid.innerHTML = products.map(product => `
+      <div class="bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-shadow group cursor-pointer" onclick="window.location.href='product-details.html?id=${product._id}'">
+        <div class="relative aspect-[4/3] overflow-hidden">
+          ${product.stock < 5 ? '<div class="absolute top-2 left-2 z-10"><span class="bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">Low Stock</span></div>' : ''}
+          <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="${product.image_url || 'https://placehold.co/400x300/e2e8f0/94a3b8?text=' + encodeURIComponent(product.name)}" alt="${product.name}"/>
+        </div>
+        <div class="p-5">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors line-clamp-1">${product.name}</h3>
+            <span class="text-primary font-bold">$${product.price.toFixed(2)}</span>
+          </div>
+          <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mb-4">${product.description || ''}</p>
+          <div class="flex gap-2">
+            <button onclick="event.stopPropagation(); addToCartInline('${product._id}', 1, this)" class="flex-1 bg-primary text-white py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-lg">shopping_cart</span>Add to Cart
+            </button>
+            <button onclick="event.stopPropagation(); window.location.href='product-details.html?id=${product._id}'" class="px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+              <span class="material-symbols-outlined text-lg">visibility</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function addToCartInline(productId, quantity, btn) {
+    try {
+      await api.post('/api/products/' + productId + '/add-to-cart', { quantity });
+      if (btn) { btn.innerHTML = '<span class="material-symbols-outlined text-lg">check</span>Added!'; setTimeout(() => { btn.innerHTML = '<span class="material-symbols-outlined text-lg">shopping_cart</span>Add to Cart'; }, 1500); }
+    } catch (error) {
+      if (error.status === 401) window.location.href = 'login.html';
+      else alert('Error adding to cart: ' + error.message);
+    }
+  }
+
+  function filterByCategory(cat) {
+    currentCategory = cat;
+    applyFilters();
+  }
+
+  function sortProducts() {
+    currentSort = document.getElementById('sort-filter').value;
+    applyFilters();
+  }
+
+  function searchProducts() {
+    const query = document.getElementById('search-input').value.trim().toLowerCase();
+    const filtered = allProducts.filter(p =>
+      p.name.toLowerCase().includes(query) ||
+      (p.description || '').toLowerCase().includes(query) ||
+      (p.category || '').toLowerCase().includes(query)
+    );
+    displayProducts(filtered);
+  }
+
+  function applyFilters() {
+    let filtered = [...allProducts];
+    if (currentCategory) filtered = filtered.filter(p => (p.category || '').toLowerCase() === currentCategory.toLowerCase());
+    filtered.sort((a, b) => {
+      switch (currentSort) {
+        case 'price-low': return a.price - b.price;
+        case 'price-high': return b.price - a.price;
+        case 'date': return new Date(b.created_at) - new Date(a.created_at);
+        default: return a.name.localeCompare(b.name);
+      }
+    });
+    displayProducts(filtered);
+  }
+</script>
+</body></html>

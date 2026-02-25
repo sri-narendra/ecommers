@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Inventory - ShopEase</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                fontFamily: { "display": ["Inter"] },
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+        },
+    }
+</script>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary/10 bg-white dark:bg-slate-900 px-10 py-3">
+  <div class="flex items-center gap-8">
+    <div class="flex items-center gap-3 text-primary">
+      <span class="material-symbols-outlined text-3xl">inventory_2</span>
+      <h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight">ShopEase Admin</h2>
+    </div>
+  </div>
+  <nav class="hidden lg:flex items-center gap-6">
+    <a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="admin.html">Dashboard</a>
+    <a class="text-primary text-sm font-semibold border-b-2 border-primary py-1" href="admin-products.html">Inventory</a>
+    <a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="admin-orders.html">Orders</a>
+    <a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="admin-deliveries.html">Deliveries</a>
+  </nav>
+  <button onclick="logout()" class="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
+    <span class="material-symbols-outlined">logout</span>Logout
+  </button>
+</header>
+
+<main class="flex-1 px-10 py-8">
+  <div class="max-w-7xl mx-auto space-y-8">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h1 class="text-slate-900 dark:text-slate-100 text-3xl font-black leading-tight tracking-tight">Product Inventory</h1>
+        <p class="text-slate-500 dark:text-slate-400 text-base mt-1">Overview of your store's items, stock levels, and pricing.</p>
+      </div>
+      <button onclick="showAddModal()" class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+        <span class="material-symbols-outlined">add</span>Add New Product
+      </button>
+    </div>
+
+    <!-- Stats -->
+    <div id="inventory-stats" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-primary/10 text-center">
+        <p class="text-slate-500 text-sm font-medium">Total Products</p>
+        <p id="stat-total" class="text-2xl font-bold mt-1">—</p>
+      </div>
+      <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-primary/10 text-center">
+        <p class="text-slate-500 text-sm font-medium">Out of Stock</p>
+        <p id="stat-oos" class="text-2xl font-bold mt-1 text-red-500">—</p>
+      </div>
+      <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-primary/10 text-center">
+        <p class="text-slate-500 text-sm font-medium">Low Stock</p>
+        <p id="stat-low" class="text-2xl font-bold mt-1 text-amber-500">—</p>
+      </div>
+      <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-primary/10 text-center">
+        <p class="text-slate-500 text-sm font-medium">Categories</p>
+        <p id="stat-cats" class="text-2xl font-bold mt-1">—</p>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-primary/10 shadow-sm overflow-hidden">
+      <div class="p-4 border-b border-primary/10 flex flex-wrap gap-4 items-center justify-between">
+        <div class="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 px-3 h-11 w-80">
+          <span class="material-symbols-outlined text-slate-400">search</span>
+          <input id="product-search" oninput="searchProducts()" class="flex-1 text-sm border-none bg-transparent focus:ring-0 text-slate-900 dark:text-slate-100" placeholder="Search by name, category..." type="text"/>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead class="bg-primary/5 text-slate-600 dark:text-slate-400 text-sm font-semibold">
+            <tr>
+              <th class="px-6 py-4 w-16">Image</th>
+              <th class="px-6 py-4">Product Name</th>
+              <th class="px-6 py-4">Category</th>
+              <th class="px-6 py-4">Price</th>
+              <th class="px-6 py-4">Stock Level</th>
+              <th class="px-6 py-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="products-table" class="divide-y divide-primary/10">
+            <tr><td colspan="6" class="px-6 py-12 text-center"><span class="material-symbols-outlined text-primary text-4xl animate-spin">sync</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="p-6 border-t border-primary/10 flex items-center justify-between">
+        <p id="products-count" class="text-sm text-slate-500">Loading...</p>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- Add/Edit Product Modal -->
+<div id="product-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden">
+  <div class="bg-white dark:bg-slate-900 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden">
+    <div class="px-6 py-4 border-b border-primary/10 flex items-center justify-between">
+      <h3 id="modal-title" class="text-xl font-bold">Add New Product</h3>
+      <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <div class="p-6 space-y-4">
+      <input type="hidden" id="edit-product-id"/>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="col-span-2">
+          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Product Name</label>
+          <input id="p-name" class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-transparent focus:ring-primary focus:border-primary" placeholder="e.g. Wireless Headphones" type="text"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Category</label>
+          <select id="p-category" class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-transparent focus:ring-primary focus:border-primary">
+            <option>electronics</option><option>clothing</option><option>home</option><option>sports</option><option>books</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Price ($)</label>
+          <input id="p-price" class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-transparent focus:ring-primary focus:border-primary" placeholder="0.00" type="number" step="0.01"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Stock</label>
+          <input id="p-stock" class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-transparent focus:ring-primary focus:border-primary" placeholder="0" type="number"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Image URL</label>
+          <input id="p-image" class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-transparent focus:ring-primary focus:border-primary" placeholder="https://..." type="text"/>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Description</label>
+          <textarea id="p-description" rows="3" class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-transparent focus:ring-primary focus:border-primary" placeholder="Product description..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="px-6 py-4 bg-primary/5 flex justify-end gap-3">
+      <button onclick="closeModal()" class="px-4 py-2 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors">Cancel</button>
+      <button onclick="saveProduct()" class="px-6 py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary/90 shadow-md transition-all">Save Product</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/admin.js"></script>
+<script>
+  let allProducts = [];
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = 'login.html'; return; }
+    loadProducts();
+  });
+
+  async function loadProducts() {
+    try {
+      const res = await api.get('/api/products');
+      allProducts = res.products || [];
+      updateStats();
+      buildCategoryDropdown(allProducts);
+      renderProducts(allProducts);
+    } catch (err) {
+      document.getElementById('products-table').innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-slate-400">Error loading products.</td></tr>`;
+    }
+  }
+
+  function buildCategoryDropdown(products) {
+    const cats = [...new Set(products.map(p => p.category).filter(Boolean))];
+    const select = document.getElementById('p-category');
+    if (!select) return;
+    // Keep existing options but add dynamic ones
+    const existing = ['electronics', 'clothing', 'home', 'sports', 'books'];
+    const all = [...new Set([...existing, ...cats])].sort();
+    select.innerHTML = all.map(c => `<option value="${c}">${c}</option>`).join('');
+  }
+
+  function updateStats() {
+    const oos = allProducts.filter(p => p.stock === 0).length;
+    const low = allProducts.filter(p => p.stock > 0 && p.stock < 5).length;
+    const cats = new Set(allProducts.map(p => p.category)).size;
+    document.getElementById('stat-total').textContent = allProducts.length;
+    document.getElementById('stat-oos').textContent = oos;
+    document.getElementById('stat-low').textContent = low;
+    document.getElementById('stat-cats').textContent = cats;
+  }
+
+  function renderProducts(products) {
+    document.getElementById('products-count').textContent = `Showing ${products.length} of ${allProducts.length} products`;
+    const tb = document.getElementById('products-table');
+    if (!products.length) { tb.innerHTML = '<tr><td colspan="6" class="px-6 py-12 text-center text-slate-400">No products found.</td></tr>'; return; }
+    tb.innerHTML = products.map(p => {
+      const stock = p.stock || 0;
+      const stockBadge = stock === 0
+        ? `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600"><span class="size-1.5 rounded-full bg-slate-400"></span>Out of Stock</span>`
+        : stock < 5
+        ? `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700"><span class="size-1.5 rounded-full bg-amber-500"></span>${stock} Low Stock</span>`
+        : `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700"><span class="size-1.5 rounded-full bg-green-500"></span>${stock} In Stock</span>`;
+      const pid = p._id || p.id || '';
+      return `<tr class="hover:bg-primary/5 transition-colors group">
+        <td class="px-6 py-4"><div class="bg-primary/10 aspect-square rounded-lg w-12 h-12 overflow-hidden"><img class="w-full h-full object-cover" src="${p.image_url || 'https://placehold.co/48x48/e2e8f0/94a3b8?text=P'}" alt="${p.name}"/></div></td>
+        <td class="px-6 py-4">
+          <div class="flex flex-col">
+            <span class="font-bold text-slate-900 dark:text-slate-100">${p.name}</span>
+            <span class="text-xs text-slate-500">${pid.slice(-8)}</span>
+          </div>
+        </td>
+        <td class="px-6 py-4 text-slate-600 dark:text-slate-400 capitalize">${p.category || '—'}</td>
+        <td class="px-6 py-4 font-semibold">$${p.price.toFixed(2)}</td>
+        <td class="px-6 py-4">${stockBadge}</td>
+        <td class="px-6 py-4 text-right">
+          <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button onclick='editProduct(${JSON.stringify(p)})' class="p-2 text-primary hover:bg-primary/10 rounded-lg" title="Edit"><span class="material-symbols-outlined text-lg">edit</span></button>
+            <button onclick="deleteProduct('${pid}')" class="p-2 text-red-500 hover:bg-red-50 rounded-lg" title="Delete"><span class="material-symbols-outlined text-lg">delete</span></button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  function searchProducts() {
+    const q = document.getElementById('product-search').value.toLowerCase();
+    renderProducts(allProducts.filter(p => p.name.toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q)));
+  }
+
+  function showAddModal() {
+    document.getElementById('modal-title').textContent = 'Add New Product';
+    document.getElementById('edit-product-id').value = '';
+    ['p-name', 'p-price', 'p-stock', 'p-image', 'p-description'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('product-modal').classList.remove('hidden');
+  }
+
+  function editProduct(p) {
+    document.getElementById('modal-title').textContent = 'Edit Product';
+    const pid = p._id || p.id || '';
+    document.getElementById('edit-product-id').value = pid;
+    document.getElementById('p-name').value = p.name || '';
+    document.getElementById('p-category').value = p.category || '';
+    document.getElementById('p-price').value = p.price || '';
+    document.getElementById('p-stock').value = p.stock || '';
+    document.getElementById('p-image').value = p.image_url || '';
+    document.getElementById('p-description').value = p.description || '';
+    document.getElementById('product-modal').classList.remove('hidden');
+  }
+
+  function closeModal() { document.getElementById('product-modal').classList.add('hidden'); }
+
+  async function saveProduct() {
+    const id = document.getElementById('edit-product-id').value;
+    const name = document.getElementById('p-name').value.trim();
+    const price = parseFloat(document.getElementById('p-price').value);
+    if (!name || isNaN(price)) { alert('Please fill in product name and price.'); return; }
+
+    // Backend uses multipart/form-data for product create/update
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('category', document.getElementById('p-category').value);
+    formData.append('price', price);
+    formData.append('stock', parseInt(document.getElementById('p-stock').value) || 0);
+    formData.append('description', document.getElementById('p-description').value.trim());
+    // image_url is not directly sent as form field — only file upload supported
+    // but we include description to ensure required fields are met
+
+    try {
+      if (id) {
+        // PUT /api/products/<id> with multipart/form-data (admin required)
+        await api.put('/api/products/' + id, formData, { contentType: 'multipart/form-data' });
+      } else {
+        // POST /api/products with multipart/form-data (admin required)
+        await api.post('/api/products', formData, { contentType: 'multipart/form-data' });
+      }
+      closeModal();
+      loadProducts();
+    } catch (err) { alert('Error: ' + (err.message || 'Could not save product.')); }
+  }
+
+  async function deleteProduct(id) {
+    if (!confirm('Delete this product?')) return;
+    try {
+      // Correct endpoint: /api/products/<id> with DELETE (admin required)
+      await api.delete('/api/products/' + id);
+      loadProducts();
+    } catch (err) { alert('Error: ' + err.message); }
+  }
+
+  function logout() { localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href = 'login.html'; }
+</script>
+</body></html>

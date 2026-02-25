@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Orders - ShopEase</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                fontFamily: { "display": ["Inter"] },
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+        },
+    }
+</script>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-10 py-3 sticky top-0 z-50">
+  <div class="flex items-center gap-8">
+    <div class="flex items-center gap-4 text-primary">
+      <div class="size-8 flex items-center justify-center bg-primary/10 rounded-lg">
+        <span class="material-symbols-outlined text-primary">shopping_bag</span>
+      </div>
+      <h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight">ShopEase Admin</h2>
+    </div>
+  </div>
+  <nav class="hidden md:flex items-center gap-8">
+    <a class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="admin.html">Dashboard</a>
+    <a class="text-primary text-sm font-semibold border-b-2 border-primary py-1" href="admin-orders.html">Orders</a>
+    <a class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="admin-products.html">Products</a>
+    <a class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="admin-deliveries.html">Deliveries</a>
+  </nav>
+  <button onclick="logout()" class="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
+    <span class="material-symbols-outlined">logout</span>Logout
+  </button>
+</header>
+
+<main class="flex-1 flex overflow-hidden">
+  <!-- Sidebar -->
+  <aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 hidden lg:flex flex-col gap-8">
+    <div class="flex flex-col gap-2">
+      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest px-3 mb-2">Management</h3>
+      <a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-primary/5 hover:text-primary rounded-lg transition-all" href="admin.html">
+        <span class="material-symbols-outlined">dashboard</span><span class="text-sm font-semibold">Overview</span>
+      </a>
+      <a class="flex items-center gap-3 px-3 py-2.5 bg-primary/10 text-primary rounded-lg" href="admin-orders.html">
+        <span class="material-symbols-outlined">receipt_long</span><span class="text-sm font-semibold">Orders</span>
+      </a>
+      <a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-primary/5 hover:text-primary rounded-lg transition-all" href="admin-products.html">
+        <span class="material-symbols-outlined">inventory_2</span><span class="text-sm font-semibold">Inventory</span>
+      </a>
+      <a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-primary/5 hover:text-primary rounded-lg transition-all" href="admin-deliveries.html">
+        <span class="material-symbols-outlined">local_shipping</span><span class="text-sm font-semibold">Deliveries</span>
+      </a>
+    </div>
+    <div class="mt-auto">
+      <a href="index.html" class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-primary transition-colors">
+        <span class="material-symbols-outlined">storefront</span><span class="text-sm font-medium">View Store</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <section class="flex-1 flex flex-col min-w-0 bg-slate-50 dark:bg-slate-950">
+    <div class="px-8 py-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+        <div>
+          <h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Order Management</h1>
+          <p class="text-slate-500 dark:text-slate-400 mt-1">Streamline your fulfillment process and track customer deliveries.</p>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="flex flex-wrap items-center gap-4 mb-6">
+        <div class="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-lg">
+          <span class="text-xs font-bold text-slate-400 uppercase">View:</span>
+          <button onclick="filterOrders('all')" id="filter-all" class="text-sm font-semibold text-primary px-2 py-0.5 bg-primary/10 rounded">All Orders</button>
+          <button onclick="filterOrders('pending')" id="filter-pending" class="text-sm font-medium text-slate-500 hover:text-primary px-2 py-0.5 transition-colors">Pending</button>
+          <button onclick="filterOrders('completed')" id="filter-completed" class="text-sm font-medium text-slate-500 hover:text-primary px-2 py-0.5 transition-colors">Completed</button>
+        </div>
+      </div>
+
+      <!-- Orders Table -->
+      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Order ID</th>
+                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Customer</th>
+                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Date</th>
+                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Amount</th>
+                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="orders-table" class="divide-y divide-slate-100 dark:divide-slate-800">
+              <tr><td colspan="6" class="px-6 py-12 text-center"><span class="material-symbols-outlined text-primary text-4xl animate-spin">sync</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="table-footer" class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
+          <p id="order-count" class="text-sm text-slate-500">Loading...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+</div>
+</div>
+
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/admin.js"></script>
+<script>
+  let allOrders = [];
+  let currentFilter = 'all';
+  const STATUS_COLORS = {
+    pending: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+    confirmed: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+    shipped: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
+    delivered: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300',
+    cancelled: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300',
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = 'login.html'; return; }
+    loadOrders();
+  });
+
+  async function loadOrders() {
+    try {
+      const res = await api.get('/api/admin/orders');
+      allOrders = res.orders || [];
+      renderOrders(allOrders);
+    } catch (err) {
+      document.getElementById('orders-table').innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-slate-400">${err.status === 401 ? '<a href="login.html" class="text-primary font-bold">Please login</a>' : 'Error loading orders.'}</td></tr>`;
+    }
+  }
+
+  function filterOrders(filter) {
+    currentFilter = filter;
+    document.querySelectorAll('[id^=filter-]').forEach(b => {
+      b.classList.remove('text-primary', 'bg-primary/10');
+      b.classList.add('text-slate-500');
+    });
+    const btn = document.getElementById('filter-' + filter);
+    if (btn) { btn.classList.add('text-primary', 'bg-primary/10'); btn.classList.remove('text-slate-500'); }
+    const filtered = filter === 'all' ? allOrders : allOrders.filter(o => (o.status || 'pending') === filter);
+    renderOrders(filtered);
+  }
+
+  function renderOrders(orders) {
+    const tb = document.getElementById('orders-table');
+    document.getElementById('order-count').textContent = `Showing ${orders.length} order${orders.length !== 1 ? 's' : ''}`;
+    if (!orders.length) {
+      tb.innerHTML = '<tr><td colspan="6" class="px-6 py-12 text-center text-slate-400">No orders found.</td></tr>';
+      return;
+    }
+    tb.innerHTML = orders.map(o => {
+      const status = o.status || 'pending';
+      const colorClass = STATUS_COLORS[status] || STATUS_COLORS.pending;
+      const orderId = o.id || o._id || '';
+      const customer = o.user_id || 'Customer';
+      const date = o.created_at ? new Date(o.created_at).toLocaleDateString() : 'N/A';
+      const amount = (o.total_price || 0).toFixed(2);
+      return `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+        <td class="px-6 py-4"><span class="font-mono text-sm font-bold text-primary">#${orderId.slice(-6)}</span></td>
+        <td class="px-6 py-4">
+          <div class="flex items-center gap-3">
+            <div class="size-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">${(customer).substring(0,2).toUpperCase()}</div>
+            <span class="text-sm font-semibold text-slate-900 dark:text-slate-100">${customer}</span>
+          </div>
+        </td>
+        <td class="px-6 py-4 text-sm text-slate-500">${date}</td>
+        <td class="px-6 py-4 text-sm font-bold text-slate-900 dark:text-white">$${amount}</td>
+        <td class="px-6 py-4">
+          <select onchange="updateOrderStatus('${orderId}', this.value)" class="form-select ${colorClass} border-none text-xs font-bold rounded-lg py-1 px-3 focus:ring-2 focus:ring-primary">
+            <option value="pending" ${status==='pending'?'selected':''}>Pending</option>
+            <option value="confirmed" ${status==='confirmed'?'selected':''}>Confirmed</option>
+            <option value="shipped" ${status==='shipped'?'selected':''}>Shipped</option>
+            <option value="delivered" ${status==='delivered'?'selected':''}>Delivered</option>
+            <option value="cancelled" ${status==='cancelled'?'selected':''}>Cancelled</option>
+          </select>
+        </td>
+        <td class="px-6 py-4 text-right">
+          <button class="text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined">more_horiz</span></button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  async function updateOrderStatus(orderId, status) {
+    try {
+      // Correct endpoint: /api/admin/orders/<id>/status with PUT
+      await api.put('/api/admin/orders/' + orderId + '/status', { status });
+      const order = allOrders.find(o => (o.id || o._id) === orderId);
+      if (order) order.status = status;
+    } catch (err) { alert('Error updating status: ' + err.message); loadOrders(); }
+  }
+
+  function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = 'login.html';
+  }
+</script>
+</body></html>

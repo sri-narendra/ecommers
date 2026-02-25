@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Dashboard - ShopEase</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                fontFamily: { "display": ["Inter", "sans-serif"] },
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+        },
+    }
+</script>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<header class="sticky top-0 z-50 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md px-6 py-3">
+  <div class="flex items-center gap-8">
+    <div class="flex items-center gap-2 text-primary">
+      <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+        <span class="material-symbols-outlined">analytics</span>
+      </div>
+      <h2 class="text-slate-900 dark:text-slate-100 text-xl font-bold tracking-tight">ShopAdmin</h2>
+    </div>
+    <nav class="hidden md:flex items-center gap-6">
+      <a class="text-primary text-sm font-semibold" href="admin.html">Dashboard</a>
+      <a class="text-slate-600 dark:text-slate-400 hover:text-primary text-sm font-medium transition-colors" href="admin-products.html">Inventory</a>
+      <a class="text-slate-600 dark:text-slate-400 hover:text-primary text-sm font-medium transition-colors" href="admin-orders.html">Orders</a>
+      <a class="text-slate-600 dark:text-slate-400 hover:text-primary text-sm font-medium transition-colors" href="admin-deliveries.html">Deliveries</a>
+    </nav>
+  </div>
+  <div class="flex items-center gap-4">
+    <div class="flex items-center gap-2 border-l border-slate-200 dark:border-slate-800 pl-4">
+      <button onclick="logout()" class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
+        <span class="material-symbols-outlined">logout</span>Logout
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="flex flex-1">
+  <!-- Sidebar -->
+  <aside class="w-64 border-r border-slate-200 dark:border-slate-800 p-6 flex flex-col gap-8 bg-white dark:bg-background-dark hidden lg:flex">
+    <div class="space-y-4">
+      <h1 class="text-slate-900 dark:text-slate-100 text-xs font-bold uppercase tracking-wider opacity-50">Management</h1>
+      <nav class="flex flex-col gap-1">
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary" href="admin.html">
+          <span class="material-symbols-outlined text-[20px]">dashboard</span>
+          <span class="text-sm font-semibold">Overview</span>
+        </a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" href="admin-products.html">
+          <span class="material-symbols-outlined text-[20px]">inventory_2</span>
+          <span class="text-sm font-medium">Products</span>
+        </a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" href="admin-orders.html">
+          <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+          <span class="text-sm font-medium">Orders</span>
+        </a>
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" href="admin-deliveries.html">
+          <span class="material-symbols-outlined text-[20px]">local_shipping</span>
+          <span class="text-sm font-medium">Deliveries</span>
+        </a>
+      </nav>
+    </div>
+    <div class="mt-auto space-y-4">
+      <div class="flex flex-col gap-1 pt-4 border-t border-slate-200 dark:border-slate-800">
+        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:text-primary transition-colors" href="index.html">
+          <span class="material-symbols-outlined text-[20px]">storefront</span>
+          <span class="text-sm font-medium">View Store</span>
+        </a>
+        <button onclick="logout()" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:text-red-500 transition-colors w-full text-left">
+          <span class="material-symbols-outlined text-[20px]">logout</span>
+          <span class="text-sm font-medium">Logout</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-y-auto p-8">
+    <div class="mb-8 flex flex-col gap-2">
+      <h1 class="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Analytics Overview</h1>
+      <p class="text-slate-500 dark:text-slate-400">Real-time performance metrics for your e-commerce ecosystem.</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div id="stats-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="flex flex-col gap-3 rounded-xl bg-white dark:bg-slate-900 p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex items-center justify-between">
+          <span class="text-slate-500 text-sm font-medium">Total Users</span>
+          <div class="size-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600">
+            <span class="material-symbols-outlined text-[20px]">person</span>
+          </div>
+        </div>
+        <p id="stat-users" class="text-2xl font-bold text-slate-900 dark:text-slate-100">—</p>
+      </div>
+      <div class="flex flex-col gap-3 rounded-xl bg-white dark:bg-slate-900 p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex items-center justify-between">
+          <span class="text-slate-500 text-sm font-medium">Total Products</span>
+          <div class="size-8 rounded-lg bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center text-purple-600">
+            <span class="material-symbols-outlined text-[20px]">inventory</span>
+          </div>
+        </div>
+        <p id="stat-products" class="text-2xl font-bold text-slate-900 dark:text-slate-100">—</p>
+      </div>
+      <div class="flex flex-col gap-3 rounded-xl bg-white dark:bg-slate-900 p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex items-center justify-between">
+          <span class="text-slate-500 text-sm font-medium">Total Orders</span>
+          <div class="size-8 rounded-lg bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center text-orange-600">
+            <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
+          </div>
+        </div>
+        <p id="stat-orders" class="text-2xl font-bold text-slate-900 dark:text-slate-100">—</p>
+      </div>
+      <div class="flex flex-col gap-3 rounded-xl bg-white dark:bg-slate-900 p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex items-center justify-between">
+          <span class="text-slate-500 text-sm font-medium">Revenue</span>
+          <div class="size-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600">
+            <span class="material-symbols-outlined text-[20px]">payments</span>
+          </div>
+        </div>
+        <p id="stat-revenue" class="text-2xl font-bold text-slate-900 dark:text-slate-100">—</p>
+      </div>
+    </div>
+
+    <!-- Revenue Chart -->
+    <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-sm mb-8">
+      <div class="mb-6 flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100">Revenue Trends</h3>
+          <p class="text-sm text-slate-500 mt-1">Monthly revenue overview</p>
+        </div>
+        <a href="admin-orders.html" class="text-sm text-primary font-bold hover:underline">View Orders →</a>
+      </div>
+      <div id="revenue-chart-container" class="h-[160px] flex items-end justify-between gap-2 pt-4">
+        <div class="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-700">
+          <span class="material-symbols-outlined animate-spin text-primary">sync</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+        <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4">Recent Orders</h3>
+        <div id="recent-orders" class="space-y-4">
+          <div class="animate-pulse flex items-center gap-4"><div class="h-4 bg-slate-200 rounded w-3/4"></div></div>
+        </div>
+        <a href="admin-orders.html" class="mt-4 block text-sm text-primary font-bold hover:underline">View all orders →</a>
+      </div>
+      <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+        <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4">Quick Actions</h3>
+        <div class="space-y-3">
+          <a href="admin-products.html" class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary transition-colors group">
+            <span class="material-symbols-outlined text-primary">add_box</span>
+            <span class="font-medium text-sm">Add New Product</span>
+            <span class="ml-auto material-symbols-outlined text-slate-400 group-hover:text-primary">chevron_right</span>
+          </a>
+          <a href="admin-orders.html" class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary transition-colors group">
+            <span class="material-symbols-outlined text-primary">receipt_long</span>
+            <span class="font-medium text-sm">Manage Orders</span>
+            <span class="ml-auto material-symbols-outlined text-slate-400 group-hover:text-primary">chevron_right</span>
+          </a>
+          <a href="admin-deliveries.html" class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary transition-colors group">
+            <span class="material-symbols-outlined text-primary">local_shipping</span>
+            <span class="font-medium text-sm">Track Deliveries</span>
+            <span class="ml-auto material-symbols-outlined text-slate-400 group-hover:text-primary">chevron_right</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</div>
+
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/admin.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = 'login.html'; return; }
+    loadAdminStats();
+    loadRecentOrders();
+  });
+
+  async function loadAdminStats() {
+    try {
+      // Use the dedicated dashboard endpoint for aggregated stats
+      const dashRes = await api.get('/api/admin/dashboard');
+      const dash = dashRes.dashboard || {};
+      document.getElementById('stat-users').textContent = dash.total_users ?? '—';
+      document.getElementById('stat-products').textContent = dash.total_products ?? '—';
+      document.getElementById('stat-orders').textContent = dash.total_orders ?? '—';
+
+      // Get orders to compute total revenue
+      const ordersRes = await api.get('/api/admin/orders');
+      const orders = ordersRes.orders || [];
+      const revenue = orders.reduce((sum, o) => sum + (o.total_price || 0), 0);
+      document.getElementById('stat-revenue').textContent = '$' + revenue.toFixed(2);
+
+      // Draw dynamic chart from monthly data
+      drawRevenueChart(orders);
+    } catch (err) { console.error('Stats error:', err); }
+  }
+
+  function drawRevenueChart(orders) {
+    // Build 6-month revenue buckets
+    const now = new Date();
+    const months = Array.from({ length: 6 }, (_, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() - 5 + i, 1);
+      return { label: d.toLocaleString('default', { month: 'short' }), total: 0, key: `${d.getFullYear()}-${d.getMonth()}` };
+    });
+    orders.forEach(o => {
+      const d = new Date(o.created_at);
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      const bucket = months.find(m => m.key === key);
+      if (bucket) bucket.total += (o.total_price || 0);
+    });
+    const maxVal = Math.max(...months.map(m => m.total), 1);
+    const W = 478, H = 150;
+    const pts = months.map((m, i) => {
+      const x = (i / (months.length - 1)) * W;
+      const y = H - (m.total / maxVal) * (H - 10) - 5;
+      return [x, y];
+    });
+    const lineD = pts.map((p, i) => (i === 0 ? `M${p[0]} ${p[1]}` : `L${p[0]} ${p[1]}`)).join(' ');
+    const areaD = lineD + ` L${W} ${H} L0 ${H} Z`;
+    const chartContainer = document.getElementById('revenue-chart-container');
+    chartContainer.innerHTML = `
+      <div class="flex items-end justify-between mb-2 gap-2">
+        ${months.map(m => `<div class="flex flex-col items-center gap-1 flex-1">
+          <div class="w-full rounded-t-sm bg-primary/80" style="height:${Math.max(4, (m.total/maxVal)*140)}px"></div>
+          <span class="text-[10px] text-slate-500">${m.label}</span>
+        </div>`).join('')}
+      </div>
+    `;
+  }
+
+  async function loadRecentOrders() {
+    try {
+      const res = await api.get('/api/admin/orders');
+      const orders = (res.orders || []).slice(0, 5);
+      const el = document.getElementById('recent-orders');
+      if (!orders.length) { el.innerHTML = '<p class="text-slate-400 text-sm">No orders found.</p>'; return; }
+      el.innerHTML = orders.map(o => `
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div>
+            <p class="text-sm font-semibold">#${(o.id || o._id || '').slice(-6) || 'N/A'}</p>
+            <p class="text-xs text-slate-500">${o.user_id || 'Customer'} • ${o.created_at ? new Date(o.created_at).toLocaleDateString() : 'N/A'}</p>
+          </div>
+          <div class="flex flex-col items-end gap-1">
+            <span class="text-xs font-bold text-slate-900 dark:text-white">$${(o.total_price || 0).toFixed(2)}</span>
+            <span class="rounded-full px-2 py-0.5 text-[10px] font-bold ${o.status === 'delivered' ? 'bg-emerald-100 text-emerald-700' : o.status === 'shipped' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}">${(o.status || 'pending').toUpperCase()}</span>
+          </div>
+        </div>
+      `).join('');
+    } catch (err) { console.error('Orders error:', err); }
+  }
+
+  function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = 'login.html';
+  }
+</script>
+</body></html>

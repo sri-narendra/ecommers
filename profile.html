@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>My Profile - ShopEase</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#137fec",
+            "background-light": "#f6f7f8",
+            "background-dark": "#101922",
+          },
+          fontFamily: { "display": ["Inter"] },
+          borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+        },
+      },
+    }
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; }
+  .status-badge { @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold; }
+  #edit-form, #password-form { display: none; }
+</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<!-- Navigation Bar -->
+<nav class="sticky top-0 z-50 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16 items-center">
+      <div class="flex items-center gap-8">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 bg-primary rounded flex items-center justify-center">
+            <span class="material-icons text-white text-lg">shopping_bag</span>
+          </div>
+          <a href="index.html" class="font-bold text-xl tracking-tight text-primary">ShopEase</a>
+        </div>
+        <div class="hidden md:flex gap-6 text-sm font-medium text-slate-600 dark:text-slate-400">
+          <a class="hover:text-primary transition-colors" href="index.html">Home</a>
+          <a class="hover:text-primary transition-colors" href="products.html">Products</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="cart.html" class="p-2 text-slate-500 hover:text-primary transition-colors relative">
+          <span class="material-icons">shopping_cart</span>
+        </a>
+        <button onclick="logout()" class="p-2 text-red-500 hover:text-red-700 transition-colors flex items-center gap-1 text-sm font-medium">
+          <span class="material-icons text-sm">logout</span> Logout
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Profile Header -->
+  <div class="bg-white dark:bg-slate-900/50 rounded-xl shadow-sm border border-primary/10 overflow-hidden mb-8">
+    <div class="h-32 bg-gradient-to-r from-primary/20 to-primary/5 relative">
+      <div class="absolute -bottom-12 left-8 p-1 bg-white dark:bg-slate-900 rounded-2xl">
+        <div class="w-24 h-24 rounded-xl bg-primary/10 flex items-center justify-center">
+          <span class="material-icons text-primary text-5xl">account_circle</span>
+        </div>
+      </div>
+    </div>
+    <div class="pt-16 pb-6 px-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+      <div>
+        <h1 id="user-name" class="text-2xl font-bold text-slate-900 dark:text-white">Loading...</h1>
+        <p id="user-email" class="text-slate-500 dark:text-slate-400 flex items-center gap-2 mt-1">
+          <span class="material-icons text-sm">email</span>
+          Loading...
+        </p>
+        <div class="flex gap-6 mt-4">
+          <div class="flex flex-col">
+            <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Member Since</span>
+            <span id="user-joined" class="text-sm font-medium">Loading...</span>
+          </div>
+          <div class="w-px h-8 bg-primary/10 self-end mb-1"></div>
+          <div class="flex flex-col">
+            <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Role</span>
+            <span id="user-role" class="text-sm font-medium text-primary">Loading...</span>
+          </div>
+        </div>
+      </div>
+      <button onclick="showEditForm()" class="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-lg font-semibold flex items-center gap-2 transition-all shadow-lg shadow-primary/20 active:scale-95">
+        <span class="material-icons text-sm">edit</span>
+        Edit Profile
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Grid -->
+  <div id="profile-content-area" style="display:none">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <!-- Sidebar -->
+      <aside class="lg:col-span-1 space-y-2">
+        <a class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-lg font-semibold transition-colors" href="#">
+          <span class="material-icons">history</span> Order History
+        </a>
+        <button onclick="showChangePasswordForm()" class="w-full flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-primary/5 rounded-lg transition-colors">
+          <span class="material-icons">lock</span> Change Password
+        </button>
+        <a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-primary/5 rounded-lg transition-colors" href="cart.html">
+          <span class="material-icons">shopping_cart</span> My Cart
+        </a>
+        <div class="pt-4 mt-4 border-t border-primary/10">
+          <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-colors">
+            <span class="material-icons">logout</span> Sign Out
+          </button>
+        </div>
+      </aside>
+
+      <!-- Order History -->
+      <div class="lg:col-span-3">
+        <div class="bg-white dark:bg-slate-900/50 rounded-xl shadow-sm border border-primary/10">
+          <div class="p-6 border-b border-primary/10 flex justify-between items-center">
+            <h2 class="text-lg font-bold">Order History</h2>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left">
+              <thead>
+                <tr class="text-xs uppercase tracking-wider text-slate-400 bg-background-light dark:bg-background-dark/50">
+                  <th class="px-6 py-4 font-semibold">Order ID</th>
+                  <th class="px-6 py-4 font-semibold">Date</th>
+                  <th class="px-6 py-4 font-semibold">Total</th>
+                  <th class="px-6 py-4 font-semibold">Status</th>
+                  <th class="px-6 py-4 font-semibold">Delivery</th>
+                </tr>
+              </thead>
+              <tbody id="orders-list" class="divide-y divide-primary/5">
+                <tr>
+                  <td colspan="5" class="px-6 py-8 text-center text-slate-400">Loading orders...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div id="profile-loading" class="flex items-center justify-center py-20">
+    <div class="text-center">
+      <span class="material-icons text-primary text-5xl animate-spin">sync</span>
+      <p class="mt-4 text-slate-500">Loading your profile...</p>
+    </div>
+  </div>
+
+  <!-- Edit Profile Form -->
+  <div id="edit-form" class="max-w-lg mx-auto">
+    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-primary/10 p-8">
+      <div class="flex items-center gap-3 mb-6">
+        <button onclick="hideEditForm()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+          <span class="material-icons">arrow_back</span>
+        </button>
+        <h2 class="text-xl font-bold">Edit Profile</h2>
+      </div>
+      <form id="edit-profile-form" class="space-y-5">
+        <div class="flex flex-col gap-2">
+          <label class="text-slate-700 dark:text-slate-300 text-sm font-semibold" for="edit-name">Full Name</label>
+          <input class="block w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" type="text" id="edit-name" required/>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-slate-700 dark:text-slate-300 text-sm font-semibold" for="edit-email">Email</label>
+          <input class="block w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" type="email" id="edit-email" required/>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="hideEditForm()" class="flex-1 py-3 border border-slate-200 dark:border-slate-700 rounded-lg font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Cancel</button>
+          <button type="submit" class="flex-1 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Change Password Form -->
+  <div id="password-form" class="max-w-lg mx-auto">
+    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-primary/10 p-8">
+      <div class="flex items-center gap-3 mb-6">
+        <button onclick="hideChangePasswordForm()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+          <span class="material-icons">arrow_back</span>
+        </button>
+        <h2 class="text-xl font-bold">Change Password</h2>
+      </div>
+      <form id="change-password-form" class="space-y-5">
+        <div class="flex flex-col gap-2">
+          <label class="text-slate-700 dark:text-slate-300 text-sm font-semibold" for="current-password">Current Password</label>
+          <input class="block w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" type="password" id="current-password" required/>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-slate-700 dark:text-slate-300 text-sm font-semibold" for="new-password">New Password</label>
+          <input class="block w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" type="password" id="new-password" required/>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-slate-700 dark:text-slate-300 text-sm font-semibold" for="confirm-new-password">Confirm New Password</label>
+          <input class="block w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" type="password" id="confirm-new-password" required/>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="hideChangePasswordForm()" class="flex-1 py-3 border border-slate-200 dark:border-slate-700 rounded-lg font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Cancel</button>
+          <button type="submit" class="flex-1 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors">Change Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer class="mt-12 py-8 border-t border-primary/10">
+  <div class="max-w-7xl mx-auto px-4 text-center">
+    <p class="text-slate-400 text-sm">© 2024 ShopEase. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  const statusStyles = {
+    pending:    'bg-amber-100 text-amber-700',
+    processing: 'bg-blue-100 text-blue-700',
+    shipped:    'bg-green-100 text-green-700',
+    delivered:  'bg-green-100 text-green-700',
+    cancelled:  'bg-red-100 text-red-700',
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadProfile();
+  });
+
+  async function loadProfile() {
+    const loading = document.getElementById('profile-loading');
+    const content = document.getElementById('profile-content-area');
+    loading.style.display = 'flex';
+    content.style.display = 'none';
+
+    try {
+      const profileResponse = await api.get('/api/profile');
+      const user = profileResponse.user;
+
+      document.getElementById('user-name').textContent = user.name;
+      document.getElementById('user-email').innerHTML = `<span class="material-icons text-sm">email</span> ${user.email}`;
+      document.getElementById('user-role').textContent = user.role.toUpperCase();
+      document.getElementById('user-joined').textContent = new Date(user.created_at).toLocaleDateString('en-US', {year:'numeric', month:'long'});
+
+      await loadOrders();
+
+      loading.style.display = 'none';
+      content.style.display = 'block';
+    } catch (err) {
+      loading.style.display = 'none';
+      if (err.status === 401) window.location.href = 'login.html';
+      else alert('Error loading profile: ' + err.message);
+    }
+  }
+
+  async function loadOrders() {
+    const ordersList = document.getElementById('orders-list');
+    try {
+      const response = await api.get('/api/orders');
+      const orders = response.orders;
+
+      if (!orders || orders.length === 0) {
+        ordersList.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400">No orders found.</td></tr>';
+        return;
+      }
+
+      ordersList.innerHTML = orders.slice(0, 10).map(order => {
+        const style = statusStyles[order.status] || 'bg-slate-100 text-slate-700';
+        return `<tr class="hover:bg-primary/5 transition-colors">
+          <td class="px-6 py-4 font-medium text-primary">#${order.id.slice(-8).toUpperCase()}</td>
+          <td class="px-6 py-4 text-sm">${new Date(order.created_at).toLocaleDateString()}</td>
+          <td class="px-6 py-4 font-bold">$${order.total_price.toFixed(2)}</td>
+          <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${style}"><span class="w-1.5 h-1.5 rounded-full mr-2 bg-current"></span>${order.status}</span></td>
+          <td class="px-6 py-4 text-sm text-slate-500">${order.delivery_status || '—'}</td>
+        </tr>`;
+      }).join('');
+    } catch (err) {
+      ordersList.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-slate-400">Could not load orders.</td></tr>';
+    }
+  }
+
+  function showEditForm() {
+    document.getElementById('edit-name').value = document.getElementById('user-name').textContent;
+    document.getElementById('edit-email').value = document.getElementById('user-email').textContent.trim().replace(/^email\s*/, '');
+    document.getElementById('profile-content-area').style.display = 'none';
+    document.getElementById('edit-form').style.display = 'block';
+  }
+  function hideEditForm() {
+    document.getElementById('edit-form').style.display = 'none';
+    document.getElementById('profile-content-area').style.display = 'block';
+  }
+  function showChangePasswordForm() {
+    document.getElementById('profile-content-area').style.display = 'none';
+    document.getElementById('password-form').style.display = 'block';
+  }
+  function hideChangePasswordForm() {
+    document.getElementById('password-form').style.display = 'none';
+    document.getElementById('profile-content-area').style.display = 'block';
+  }
+
+  document.getElementById('edit-profile-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+      await api.put('/api/profile', {
+        name: document.getElementById('edit-name').value,
+        email: document.getElementById('edit-email').value
+      });
+      hideEditForm();
+      loadProfile();
+    } catch (err) { alert('Error updating profile: ' + err.message); }
+  });
+
+  document.getElementById('change-password-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const np = document.getElementById('new-password').value;
+    const cnp = document.getElementById('confirm-new-password').value;
+    if (np !== cnp) { alert('New passwords do not match'); return; }
+    try {
+      await api.put('/api/change-password', {
+        current_password: document.getElementById('current-password').value,
+        new_password: np
+      });
+      alert('Password changed successfully!');
+      hideChangePasswordForm();
+    } catch (err) { alert('Error: ' + err.message); }
+  });
+
+  function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = 'index.html';
+    }
+  }
+</script>
+</body></html>

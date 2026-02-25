@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Deliveries - ShopEase</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                fontFamily: { "display": ["Inter", "sans-serif"] },
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+        },
+    }
+</script>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display transition-colors duration-200">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-primary/10 bg-white dark:bg-background-dark px-6 md:px-20 py-3 sticky top-0 z-50">
+  <div class="flex items-center gap-8">
+    <div class="flex items-center gap-3 text-primary">
+      <span class="material-symbols-outlined text-3xl">local_shipping</span>
+      <h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight">ShopEase Admin</h2>
+    </div>
+  </div>
+  <div class="flex flex-1 justify-end gap-6 items-center">
+    <nav class="hidden lg:flex items-center gap-6">
+      <a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="admin.html">Dashboard</a>
+      <a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="admin-products.html">Inventory</a>
+      <a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="admin-orders.html">Orders</a>
+      <a class="text-primary text-sm font-bold border-b-2 border-primary pb-1" href="admin-deliveries.html">Deliveries</a>
+    </nav>
+    <button onclick="logout()" class="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
+      <span class="material-symbols-outlined">logout</span>Logout
+    </button>
+  </div>
+</header>
+
+<main class="flex-1 flex flex-col max-w-7xl mx-auto w-full px-6 md:px-20 py-8">
+  <!-- Page Header -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+    <div>
+      <h1 class="text-slate-900 dark:text-slate-100 text-3xl font-black leading-tight tracking-tight">Delivery Tracking</h1>
+      <p class="text-slate-500 dark:text-slate-400 text-base font-normal mt-1">Real-time logistics management and shipment monitoring.</p>
+    </div>
+  </div>
+
+  <!-- Status Filter Tabs -->
+  <div class="mb-6">
+    <div class="flex border-b border-primary/10 gap-8 overflow-x-auto">
+      <button id="tab-all" onclick="filterDeliveries('all')" class="flex items-center justify-center border-b-2 border-primary text-primary pb-3 font-bold text-sm whitespace-nowrap">
+        All Deliveries <span id="count-all" class="ml-2 bg-primary/10 px-2 py-0.5 rounded text-xs">—</span>
+      </button>
+      <button id="tab-shipped" onclick="filterDeliveries('shipped')" class="flex items-center justify-center border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 pb-3 font-medium text-sm whitespace-nowrap">
+        In Transit <span id="count-shipped" class="ml-2 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs">—</span>
+      </button>
+      <button id="tab-completed" onclick="filterDeliveries('completed')" class="flex items-center justify-center border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 pb-3 font-medium text-sm whitespace-nowrap">
+        Delivered <span id="count-completed" class="ml-2 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs">—</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Table Section -->
+    <div class="lg:col-span-2 space-y-6">
+      <div class="bg-white dark:bg-slate-900 rounded-xl border border-primary/10 overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="bg-primary/5 dark:bg-primary/10">
+                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-primary/70">Order ID</th>
+                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-primary/70">Customer</th>
+                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-primary/70">Status</th>
+                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-primary/70">Date</th>
+                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-primary/70 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="deliveries-table" class="divide-y divide-primary/5 dark:divide-primary/10">
+              <tr><td colspan="5" class="px-6 py-12 text-center"><span class="material-symbols-outlined text-primary text-4xl animate-spin">sync</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="bg-primary/5 dark:bg-primary/10 px-6 py-4">
+          <span id="delivery-count" class="text-xs font-medium text-slate-500">Loading...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Sidebar -->
+    <div class="space-y-6">
+      <div class="bg-white dark:bg-slate-900 rounded-xl border border-primary/10 overflow-hidden shadow-sm">
+        <div class="px-6 py-4 border-b border-primary/10">
+          <h3 class="text-slate-900 dark:text-slate-100 font-bold text-lg">Delivery Overview</h3>
+          <p class="text-slate-500 text-xs">Current shipment status breakdown</p>
+        </div>
+        <div class="p-6 bg-primary/5 dark:bg-primary/10">
+          <h4 class="text-xs font-bold text-primary uppercase tracking-widest mb-4">Zone Statistics</h4>
+          <div class="space-y-4">
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-lg border border-primary/5 shadow-sm flex justify-between items-center">
+              <p class="text-sm text-primary font-bold">In Transit</p>
+              <p id="zone-shipped" class="text-2xl font-black text-slate-900 dark:text-slate-100">—</p>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-lg border border-primary/5 shadow-sm flex justify-between items-center">
+              <p class="text-sm text-emerald-500 font-bold">Delivered</p>
+              <p id="zone-completed" class="text-2xl font-black text-slate-900 dark:text-slate-100">—</p>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-lg border border-primary/5 shadow-sm flex justify-between items-center">
+              <p class="text-sm text-amber-500 font-bold">Pending</p>
+              <p id="zone-pending" class="text-2xl font-black text-slate-900 dark:text-slate-100">—</p>
+            </div>
+          </div>
+          <a href="admin-orders.html" class="w-full mt-4 py-3 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-primary/20 rounded-lg font-bold text-sm hover:border-primary transition-colors flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-sm">receipt_long</span>Manage All Orders
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="mt-auto border-t border-primary/10 bg-white dark:bg-slate-950 px-6 md:px-20 py-6">
+  <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+    <span class="text-xs font-medium text-slate-400">© 2024 ShopEase Admin. All rights reserved.</span>
+    <a class="text-xs font-medium text-slate-500 hover:text-primary" href="index.html">Back to Store</a>
+  </div>
+</footer>
+</div>
+</div>
+
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/admin.js"></script>
+<script>
+  let allDeliveries = [];
+  const STATUS_ICONS = { shipped: 'local_shipping', delivered: 'check_circle', pending: 'pending', confirmed: 'sync', cancelled: 'cancel' };
+  const STATUS_BADGES = {
+    shipped: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+    delivered: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+    pending: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+    confirmed: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+    cancelled: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400',
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = 'login.html'; return; }
+    loadDeliveries();
+  });
+
+  async function loadDeliveries() {
+    try {
+      const res = await api.get('/api/admin/orders');
+      allDeliveries = res.orders || [];
+      updateStats();
+      renderDeliveries(allDeliveries);
+    } catch (err) {
+      document.getElementById('deliveries-table').innerHTML = `<tr><td colspan="5" class="px-6 py-12 text-center text-slate-400">Error loading orders.</td></tr>`;
+    }
+  }
+
+  function updateStats() {
+    const shipped = allDeliveries.filter(o => o.status === 'shipped').length;
+    const delivered = allDeliveries.filter(o => o.status === 'delivered').length;
+    const pending = allDeliveries.filter(o => !o.status || o.status === 'pending').length;
+    document.getElementById('count-all').textContent = allDeliveries.length;
+    document.getElementById('count-shipped').textContent = shipped;
+    document.getElementById('count-completed').textContent = delivered;
+    document.getElementById('zone-shipped').textContent = shipped;
+    document.getElementById('zone-completed').textContent = delivered;
+    document.getElementById('zone-pending').textContent = pending;
+  }
+
+  function filterDeliveries(filter) {
+    document.querySelectorAll('[id^=tab-]').forEach(b => b.classList.remove('border-primary', 'text-primary', 'font-bold'));
+    document.querySelectorAll('[id^=tab-]').forEach(b => b.classList.add('border-transparent', 'text-slate-500', 'font-medium'));
+    const tab = document.getElementById('tab-' + filter);
+    if (tab) { tab.classList.add('border-primary', 'text-primary', 'font-bold'); tab.classList.remove('border-transparent', 'text-slate-500', 'font-medium'); }
+    const filtered = filter === 'all' ? allDeliveries : allDeliveries.filter(o => o.status === filter);
+    renderDeliveries(filtered);
+  }
+
+  function renderDeliveries(orders) {
+    document.getElementById('delivery-count').textContent = `Showing ${orders.length} of ${allDeliveries.length} results`;
+    const tb = document.getElementById('deliveries-table');
+    if (!orders.length) { tb.innerHTML = '<tr><td colspan="5" class="px-6 py-12 text-center text-slate-400">No deliveries found.</td></tr>'; return; }
+    tb.innerHTML = orders.map(o => {
+      const status = o.status || 'pending';
+      const badge = STATUS_BADGES[status] || STATUS_BADGES.pending;
+      const icon = STATUS_ICONS[status] || 'help';
+      const orderId = o.id || o._id || '';
+      const customer = o.user_id || 'Customer';
+      const date = o.created_at ? new Date(o.created_at).toLocaleDateString() : 'N/A';
+      return `<tr class="hover:bg-primary/5 dark:hover:bg-primary/5 transition-colors group">
+        <td class="px-6 py-5 font-bold text-sm text-slate-900 dark:text-slate-100">#${orderId.slice(-6)}</td>
+        <td class="px-6 py-5">
+          <div class="flex items-center gap-3">
+            <div class="size-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-xs font-bold">${customer.substring(0,2).toUpperCase()}</div>
+            <span class="text-sm font-medium">${customer}</span>
+          </div>
+        </td>
+        <td class="px-6 py-5">
+          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${badge}">
+            <span class="material-symbols-outlined text-[14px]">${icon}</span>${status.charAt(0).toUpperCase() + status.slice(1)}
+          </span>
+        </td>
+        <td class="px-6 py-5 text-sm text-slate-500 dark:text-slate-400">${date}</td>
+        <td class="px-6 py-5 text-right">
+          ${status === 'shipped'
+            ? `<button onclick="markDelivered('${orderId}')" class="bg-primary/10 text-primary px-3 py-1.5 rounded-lg font-bold text-xs hover:bg-primary hover:text-white transition-all">Mark Delivered</button>`
+            : `<a href="admin-orders.html" class="text-primary hover:text-primary/70 font-bold text-xs uppercase tracking-tighter">View Details</a>`
+          }
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  async function markDelivered(orderId) {
+    try {
+      // Correct endpoint: PUT /api/admin/orders/<id>/status
+      await api.put('/api/admin/orders/' + orderId + '/status', { status: 'delivered' });
+      const order = allDeliveries.find(o => (o.id || o._id) === orderId);
+      if (order) order.status = 'delivered';
+      updateStats();
+      renderDeliveries(allDeliveries);
+    } catch (err) { alert('Error updating delivery: ' + err.message); }
+  }
+
+  function logout() { localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href = 'login.html'; }
+</script>
+</body></html>

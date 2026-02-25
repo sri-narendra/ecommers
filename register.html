@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Register - ShopEase</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#137fec",
+                    "background-light": "#f6f7f8",
+                    "background-dark": "#101922",
+                },
+                fontFamily: { "display": ["Inter"] },
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+        },
+    }
+</script>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    #pw-mismatch { display: none; }
+    #strength-bar-fill { width: 0%; transition: width 0.3s; }
+</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark px-10 py-3 sticky top-0 z-50">
+  <div class="flex items-center gap-8">
+    <div class="flex items-center gap-4 text-primary">
+      <div class="size-8 flex items-center justify-center">
+        <span class="material-symbols-outlined text-3xl">shopping_basket</span>
+      </div>
+      <h2 class="text-slate-900 dark:text-slate-100 text-xl font-bold leading-tight tracking-[-0.015em]">ShopEase</h2>
+    </div>
+  </div>
+  <div class="flex flex-1 justify-end gap-8 items-center">
+    <nav class="hidden md:flex items-center gap-8">
+      <a class="text-slate-700 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="index.html">Home</a>
+      <a class="text-slate-700 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="products.html">Products</a>
+    </nav>
+    <div class="flex items-center gap-4">
+      <a href="login.html" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all">
+        <span>Login</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main class="flex-1 flex items-center justify-center p-4 md:p-10">
+  <div class="w-full max-w-[540px] bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+    <div class="p-8 md:p-10">
+      <div class="mb-8 text-center">
+        <h1 class="text-slate-900 dark:text-slate-100 text-3xl font-black leading-tight tracking-[-0.033em] mb-2">Create Account</h1>
+        <p class="text-slate-500 dark:text-slate-400 text-base">Join the ShopEase community today</p>
+      </div>
+      <form class="space-y-5" id="register-form">
+        <!-- Full Name -->
+        <div class="flex flex-col gap-2">
+          <label class="text-slate-700 dark:text-slate-300 text-sm font-semibold" for="name">Full Name</label>
+          <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
+              <span class="material-symbols-outlined text-[20px]">person</span>
+            </div>
+            <input class="block w-full pl-10 pr-3 py-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-400" placeholder="John Doe" type="text" id="name" required/>
+          </div>
+        </div>
+        <!-- Email -->
+        <div class="flex flex-col gap-2">
+          <label class="text-slate-700 dark:text-slate-300 text-sm font-semibold" for="email">Email Address</label>
+          <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
+              <span class="material-symbols-outlined text-[20px]">mail</span>
+            </div>
+            <input class="block w-full pl-10 pr-3 py-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-400" placeholder="john@example.com" type="email" id="email" required/>
+          </div>
+        </div>
+        <!-- Password -->
+        <div class="flex flex-col gap-2">
+          <label class="text-slate-700 dark:text-slate-300 text-sm font-semibold" for="password">Password</label>
+          <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
+              <span class="material-symbols-outlined text-[20px]">lock</span>
+            </div>
+            <input class="block w-full pl-10 pr-12 py-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-400" placeholder="••••••••" type="password" id="password" required/>
+            <button class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300" type="button" id="toggle-pw">
+              <span class="material-symbols-outlined">visibility</span>
+            </button>
+          </div>
+          <!-- Strength Indicator -->
+          <div class="mt-2 space-y-1.5">
+            <div class="flex items-center gap-2 text-xs text-slate-500">
+              <div class="h-1 flex-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div id="strength-bar-fill" class="h-full rounded-full bg-slate-300"></div>
+              </div>
+              <span id="strength-label" class="font-medium text-slate-400">Enter password</span>
+            </div>
+          </div>
+        </div>
+        <!-- Confirm Password -->
+        <div class="flex flex-col gap-2">
+          <label class="text-slate-700 dark:text-slate-300 text-sm font-semibold" for="confirm-password">Confirm Password</label>
+          <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
+              <span class="material-symbols-outlined text-[20px]">lock_reset</span>
+            </div>
+            <input class="block w-full pl-10 pr-3 py-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-400" placeholder="••••••••" type="password" id="confirm-password" required/>
+          </div>
+          <p id="pw-mismatch" class="text-[11px] text-red-500 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">error</span> Passwords do not match
+          </p>
+        </div>
+        <div class="pt-4">
+          <button class="w-full bg-primary text-white py-4 rounded-lg font-bold text-lg hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2" type="submit" id="register-btn">
+            Create Account
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </button>
+        </div>
+      </form>
+      <div class="mt-10 text-center">
+        <p class="text-slate-500 dark:text-slate-400 text-sm">
+          Already have an account?
+          <a class="text-primary font-bold hover:underline ml-1" href="login.html">Log in here</a>
+        </p>
+      </div>
+    </div>
+    <div class="bg-slate-50 dark:bg-slate-800/50 p-4 border-t border-slate-200 dark:border-slate-800 text-center">
+      <p class="text-[11px] text-slate-400 leading-relaxed">
+        By creating an account, you agree to our <a class="underline hover:text-slate-600 dark:hover:text-slate-200" href="#">Terms of Service</a> and <a class="underline hover:text-slate-600 dark:hover:text-slate-200" href="#">Privacy Policy</a>.
+      </p>
+    </div>
+  </div>
+</main>
+
+<footer class="mt-auto px-10 py-8 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+    <span class="text-slate-400 text-sm font-medium">© 2024 ShopEase Inc.</span>
+    <div class="flex gap-8">
+      <a class="text-xs font-medium text-slate-500 hover:text-primary transition-colors" href="#">Privacy</a>
+      <a class="text-xs font-medium text-slate-500 hover:text-primary transition-colors" href="#">Terms</a>
+      <a class="text-xs font-medium text-slate-500 hover:text-primary transition-colors" href="#">Help Center</a>
+    </div>
+  </div>
+</footer>
+</div>
+</div>
+
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('token')) window.location.href = 'index.html';
+
+    // Password visibility toggle
+    document.getElementById('toggle-pw').addEventListener('click', () => {
+      const pw = document.getElementById('password');
+      const icon = document.querySelector('#toggle-pw .material-symbols-outlined');
+      pw.type = pw.type === 'password' ? 'text' : 'password';
+      icon.textContent = pw.type === 'password' ? 'visibility' : 'visibility_off';
+    });
+
+    // Password strength meter
+    document.getElementById('password').addEventListener('input', (e) => {
+      const val = e.target.value;
+      const bar = document.getElementById('strength-bar-fill');
+      const label = document.getElementById('strength-label');
+      let strength = 0;
+      if (val.length >= 8) strength++;
+      if (/[0-9]/.test(val)) strength++;
+      if (/[^a-zA-Z0-9]/.test(val)) strength++;
+      if (val.length >= 12) strength++;
+      const widths = ['0%','30%','55%','80%','100%'];
+      const colors = ['bg-slate-300','bg-red-400','bg-amber-400','bg-yellow-400','bg-green-500'];
+      const labels = ['Enter password','Weak','Fair','Medium','Strong'];
+      const labelColors = ['text-slate-400','text-red-500','text-amber-500','text-yellow-500','text-green-500'];
+      bar.style.width = widths[strength];
+      bar.className = `h-full rounded-full ${colors[strength]}`;
+      label.textContent = labels[strength];
+      label.className = `font-medium ${labelColors[strength]}`;
+    });
+
+    // Confirm password live check
+    document.getElementById('confirm-password').addEventListener('input', () => {
+      const pw = document.getElementById('password').value;
+      const cpw = document.getElementById('confirm-password').value;
+      document.getElementById('pw-mismatch').style.display = (cpw && pw !== cpw) ? 'flex' : 'none';
+    });
+
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+
+      if (password !== confirmPassword) {
+        document.getElementById('pw-mismatch').style.display = 'flex';
+        return;
+      }
+
+      const btn = document.getElementById('register-btn');
+      btn.disabled = true;
+      btn.innerHTML = 'Creating Account... <span class="material-symbols-outlined">hourglass_empty</span>';
+
+      try {
+        await api.post('/api/register', { name, email, password });
+        window.location.href = 'login.html?registered=1';
+      } catch (error) {
+        alert('Registration failed: ' + error.message);
+        btn.disabled = false;
+        btn.innerHTML = 'Create Account <span class="material-symbols-outlined">arrow_forward</span>';
+      }
+    });
+  });
+</script>
+</body></html>

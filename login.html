@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login - ShopEase</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#137fec",
+                    "background-light": "#f6f7f8",
+                    "background-dark": "#101922",
+                },
+                fontFamily: {
+                    "display": ["Inter"]
+                },
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+        },
+    }
+</script>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    #error-message { display: none; }
+</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex min-h-screen flex-col">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 lg:px-20 py-3 sticky top-0 z-50">
+  <div class="flex items-center gap-8">
+    <div class="flex items-center gap-2 text-primary">
+      <div class="size-8 flex items-center justify-center">
+        <span class="material-symbols-outlined text-3xl">shopping_basket</span>
+      </div>
+      <h2 class="text-slate-900 dark:text-slate-100 text-xl font-bold leading-tight tracking-tight">ShopEase</h2>
+    </div>
+    <div class="hidden md:flex items-center gap-6">
+      <a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="index.html">Home</a>
+      <a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="products.html">Products</a>
+    </div>
+  </div>
+  <div class="flex items-center gap-4">
+    <a href="register.html" class="flex items-center justify-center rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold transition-opacity hover:opacity-90">Sign Up</a>
+  </div>
+</header>
+
+<main class="flex-grow flex items-center justify-center px-4 py-12 lg:py-20">
+  <div class="w-full max-w-[480px] space-y-8 bg-white dark:bg-slate-900 p-8 lg:p-12 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800">
+    <!-- Login Header -->
+    <div class="text-center space-y-2">
+      <h1 class="text-slate-900 dark:text-white text-3xl font-black tracking-tight">Welcome Back</h1>
+      <p class="text-slate-500 dark:text-slate-400 text-base">Please enter your details to sign in to your account.</p>
+    </div>
+    <!-- Error Message -->
+    <div id="error-message" class="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 p-3 rounded-lg flex items-center gap-3">
+      <span class="material-symbols-outlined text-red-500 text-xl">error</span>
+      <p id="error-text" class="text-red-600 dark:text-red-400 text-sm font-medium">Invalid email or password. Please try again.</p>
+    </div>
+    <!-- Form -->
+    <form class="space-y-6" id="login-form">
+      <div class="space-y-2">
+        <label class="block text-slate-700 dark:text-slate-300 text-sm font-semibold" for="email">Email Address</label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">mail</span>
+          <input class="w-full h-14 pl-12 pr-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none text-slate-900 dark:text-white" id="email" placeholder="name@example.com" type="email" required/>
+        </div>
+      </div>
+      <div class="space-y-2">
+        <div class="flex justify-between items-center">
+          <label class="block text-slate-700 dark:text-slate-300 text-sm font-semibold" for="password">Password</label>
+          <a class="text-primary text-xs font-bold hover:underline" href="#">Forgot password?</a>
+        </div>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">lock</span>
+          <input class="w-full h-14 pl-12 pr-12 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none text-slate-900 dark:text-white" id="password" placeholder="••••••••" type="password" required/>
+          <button class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" id="toggle-password" type="button">
+            <span class="material-symbols-outlined">visibility</span>
+          </button>
+        </div>
+      </div>
+      <div class="flex items-center justify-between">
+        <label class="flex items-center gap-3 cursor-pointer group">
+          <input class="h-5 w-5 rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary/20 bg-white dark:bg-slate-800" type="checkbox" id="remember-me"/>
+          <span class="text-slate-600 dark:text-slate-400 text-sm font-medium group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">Remember me</span>
+        </label>
+      </div>
+      <button class="w-full h-14 bg-primary text-white rounded-lg font-bold text-lg hover:opacity-90 transition-all shadow-lg shadow-primary/20 active:scale-[0.98]" type="submit" id="login-btn">
+        Sign In
+      </button>
+    </form>
+    <!-- Register Link -->
+    <p class="text-center text-slate-500 dark:text-slate-400 text-sm">
+      Don't have an account?
+      <a class="text-primary font-bold hover:underline ml-1" href="register.html">Create an account</a>
+    </p>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="py-10 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+  <div class="container mx-auto px-6 text-center">
+    <div class="flex justify-center gap-8 mb-6">
+      <a class="text-slate-400 hover:text-primary transition-colors text-sm" href="#">Privacy Policy</a>
+      <a class="text-slate-400 hover:text-primary transition-colors text-sm" href="#">Terms of Service</a>
+      <a class="text-slate-400 hover:text-primary transition-colors text-sm" href="#">Help Center</a>
+    </div>
+    <p class="text-slate-400 text-xs tracking-wide">© 2024 ShopEase Inc. All rights reserved.</p>
+  </div>
+</footer>
+</div>
+
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Redirect if already logged in
+    if (localStorage.getItem('token')) {
+      window.location.href = 'index.html';
+    }
+
+    // Password visibility toggle
+    document.getElementById('toggle-password').addEventListener('click', () => {
+      const pw = document.getElementById('password');
+      const icon = document.querySelector('#toggle-password .material-symbols-outlined');
+      if (pw.type === 'password') {
+        pw.type = 'text';
+        icon.textContent = 'visibility_off';
+      } else {
+        pw.type = 'password';
+        icon.textContent = 'visibility';
+      }
+    });
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errBox = document.getElementById('error-message');
+      const errText = document.getElementById('error-text');
+      errBox.style.display = 'none';
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('login-btn');
+      btn.disabled = true;
+      btn.textContent = 'Signing In...';
+
+      try {
+        const response = await api.post('/api/login', { email, password });
+        localStorage.setItem('token', response.access_token);
+        localStorage.setItem('user', JSON.stringify(response.user));
+        window.location.href = 'index.html';
+      } catch (error) {
+        errText.textContent = error.message || 'Invalid email or password. Please try again.';
+        errBox.style.display = 'flex';
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+      }
+    });
+  });
+</script>
+</body></html>
