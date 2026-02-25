@@ -27,17 +27,21 @@ async function login(email, password) {
         const response = await api.login(email, password);
         
         // Store token and user info
-        api.setToken(response.access_token);
-        localStorage.setItem('user', JSON.stringify(response.user));
-        
-        showToast('Login successful!', 'success');
-        
-        // Redirect to appropriate page
-        const user = response.user;
-        if (user.role === 'admin') {
-            window.location.href = 'admin.html';
+        if (response.success && response.data) {
+            api.setToken(response.data.access_token);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
+            
+            showToast('Login successful!', 'success');
+            
+            // Redirect to appropriate page
+            const user = response.data.user;
+            if (user.role === 'admin') {
+                window.location.href = 'admin.html';
+            } else {
+                window.location.href = 'index.html';
+            }
         } else {
-            window.location.href = 'index.html';
+            throw new Error(response.error || 'Login failed');
         }
         
         return true;
