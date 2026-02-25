@@ -35,16 +35,16 @@
 
 <main class="flex-grow">
   <!-- Hero Section -->
-  <section class="px-6 py-6 md:px-10">
-    <div class="relative overflow-hidden rounded-xl bg-slate-900 aspect-[21/9]">
-      <div class="absolute inset-0 bg-cover bg-center" style="background-image: linear-gradient(to right, rgba(0,0,0,0.7), transparent), url('https://lh3.googleusercontent.com/aida-public/AB6AXuDqPNmdAFQZlxIQcx6DgWYVDQ19mnpLITHLI69TS60UwUKts4k94vCWe5T4eGVRA96aVx7H6lPKDePkf5ipDxEODG__DbPGtQtp1XFphBBimnEO2FDjbONUlvXf_ViH-2xCiKVdVtw6jRtWfKakEtc01Ayloro0kYgEfmw1HSoP1QeUGMfQxNsQcbmIYEzrrAOZWQC-5fA-hlxFy7lbMG5htN8kLHmBJNkUrVoKnaJp7ZvuEG4_rpHq6mYpfyAOPLeSM_6qHzaP2w');"></div>
-      <div class="relative h-full flex flex-col justify-center px-12 md:px-20 max-w-2xl text-white">
-        <span class="mb-4 inline-block text-sm font-bold tracking-widest uppercase text-primary">Summer Collection 2024</span>
-        <h1 class="mb-6 text-5xl md:text-7xl font-black leading-tight tracking-tight">Elevate Your Lifestyle</h1>
-        <p class="mb-10 text-lg md:text-xl text-slate-200 font-light leading-relaxed">Discover our new collection of premium essentials designed for modern living. Quality materials, timeless design.</p>
+  <section class="px-4 py-4 md:px-10">
+    <div class="relative overflow-hidden rounded-xl bg-slate-900 min-h-[400px] md:aspect-[21/9]">
+      <div class="absolute inset-0 bg-cover bg-center" style="background-image: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.2)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuDqPNmdAFQZlxIQcx6DgWYVDQ19mnpLITHLI69TS60UwUKts4k94vCWe5T4eGVRA96aVx7H6lPKDePkf5ipDxEODG__DbPGtQtp1XFphBBimnEO2FDjbONUlvXf_ViH-2xCiKVdVtw6jRtWfKakEtc01Ayloro0kYgEfmw1HSoP1QeUGMfQxNsQcbmIYEzrrAOZWQC-5fA-hlxFy7lbMG5htN8kLHmBJNkUrVoKnaJp7ZvuEG4_rpHq6mYpfyAOPLeSM_6qHzaP2w');"></div>
+      <div class="relative h-full flex flex-col justify-center px-8 md:px-20 max-w-2xl text-white py-12">
+        <span class="mb-4 inline-block text-xs md:text-sm font-bold tracking-widest uppercase text-primary">Summer Collection 2024</span>
+        <h1 class="mb-6 text-4xl md:text-7xl font-black leading-tight tracking-tight">Elevate Your Lifestyle</h1>
+        <p class="mb-8 md:mb-10 text-base md:text-xl text-slate-200 font-light leading-relaxed">Discover our new collection of premium essentials designed for modern living. Quality materials, timeless design.</p>
         <div class="flex flex-wrap gap-4">
-          <a href="products.html" class="rounded-lg bg-primary px-8 py-4 text-base font-bold text-white shadow-lg hover:bg-primary/90 transition-all">Shop Now</a>
-          <a href="register.html" class="rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 px-8 py-4 text-base font-bold text-white hover:bg-white/20 transition-all">Get Started</a>
+          <a href="products.html" class="flex-1 sm:flex-none rounded-lg bg-primary px-8 py-4 text-center text-sm md:text-base font-bold text-white shadow-lg hover:bg-primary/90 transition-all">Shop Now</a>
+          <a href="register.html" class="flex-1 sm:flex-none rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 px-8 py-4 text-center text-sm md:text-base font-bold text-white hover:bg-white/20 transition-all">Get Started</a>
         </div>
       </div>
     </div>
@@ -59,7 +59,7 @@
       </div>
       <a class="text-sm font-bold text-primary hover:underline underline-offset-4" href="products.html">View All Products</a>
     </div>
-    <div id="featured-products-grid" class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+    <div id="featured-products-grid" class="grid grid-cols-2 gap-4 md:gap-8 lg:grid-cols-4">
       <!-- Products loaded dynamically -->
       <div class="col-span-full text-center py-16">
         <span class="material-symbols-outlined text-primary text-5xl animate-spin">sync</span>
@@ -75,7 +75,7 @@
         <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white">Browse Categories</h2>
         <p class="mt-4 text-slate-500 dark:text-slate-400 max-w-xl mx-auto">Explore our wide range of carefully curated categories to find exactly what fits your style.</p>
       </div>
-      <div id="categories-grid" class="flex flex-wrap justify-center gap-12">
+      <div id="categories-grid" class="flex flex-wrap justify-center gap-6 md:gap-12">
         <div class="animate-pulse flex items-center gap-2 text-slate-400">
           <span class="material-symbols-outlined animate-spin">sync</span> Loading categories...
         </div>
@@ -156,11 +156,11 @@
       const cats = [...new Set(products.map(p => p.category).filter(Boolean))];
       if (!cats.length) { grid.innerHTML = ''; return; }
       grid.innerHTML = cats.map(cat => `
-        <a class="group flex flex-col items-center gap-4" href="products.html?category=${encodeURIComponent(cat)}">
-          <div class="flex h-24 w-24 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-md group-hover:bg-primary group-hover:text-white transition-all duration-300">
-            <span class="material-symbols-outlined text-4xl">${getCategoryIcon(cat)}</span>
+        <a class="group flex flex-col items-center gap-2 md:gap-4" href="products.html?category=${encodeURIComponent(cat)}">
+          <div class="flex h-16 w-16 md:h-24 md:w-24 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-md group-hover:bg-primary group-hover:text-white transition-all duration-300">
+            <span class="material-symbols-outlined text-2xl md:text-4xl">${getCategoryIcon(cat)}</span>
           </div>
-          <span class="text-sm font-bold text-slate-900 dark:text-slate-200 capitalize">${cat}</span>
+          <span class="text-xs md:text-sm font-bold text-slate-900 dark:text-slate-200 capitalize">${cat}</span>
         </a>
       `).join('');
     } catch (e) {
@@ -181,12 +181,12 @@
         <div class="group relative flex flex-col gap-4 cursor-pointer" onclick="router.navigate('product-details.html', { id: '${p._id || p.id}' })">
           <div class="relative overflow-hidden rounded-xl bg-slate-100 aspect-square">
             <img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" src="${p.image_url || 'https://placehold.co/400x400/e2e8f0/94a3b8?text=' + encodeURIComponent(p.name)}" alt="${p.name}"/>
-            <button onclick="event.stopPropagation(); addToCart('${p._id || p.id}', 1)" class="absolute bottom-4 left-4 right-4 translate-y-12 bg-primary py-3 text-sm font-bold text-white opacity-0 backdrop-blur transition-all group-hover:translate-y-0 group-hover:opacity-100 rounded-lg">Add to Cart</button>
+            <button onclick="event.stopPropagation(); addToCart('${p._id || p.id}', 1)" class="absolute bottom-4 left-4 right-4 translate-y-12 bg-primary py-3 text-xs md:text-sm font-bold text-white opacity-0 backdrop-blur transition-all group-hover:translate-y-0 group-hover:opacity-100 rounded-lg">Add to Cart</button>
           </div>
           <div>
-            <p class="text-xs font-medium text-slate-400 uppercase tracking-widest">${p.category || 'General'}</p>
-            <h3 class="mt-1 text-lg font-bold text-slate-900 dark:text-white">${p.name}</h3>
-            <p class="mt-1 text-lg font-bold text-primary">$${p.price.toFixed(2)}</p>
+            <p class="text-[10px] md:text-xs font-medium text-slate-400 uppercase tracking-widest">${p.category || 'General'}</p>
+            <h3 class="mt-1 text-sm md:text-lg font-bold text-slate-900 dark:text-white line-clamp-1">${p.name}</h3>
+            <p class="mt-1 text-sm md:text-lg font-bold text-primary">$${p.price.toFixed(2)}</p>
           </div>
         </div>
       `).join('');

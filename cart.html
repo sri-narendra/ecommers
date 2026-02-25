@@ -50,21 +50,10 @@
 
   <div id="cart-content" class="hidden flex flex-col lg:flex-row gap-8">
     <div class="flex-1">
-      <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
-              <th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Product</th>
-              <th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">Price</th>
-              <th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider text-center">Quantity</th>
-              <th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider text-right">Total</th>
-              <th class="px-6 py-4 w-16"></th>
-            </tr>
-          </thead>
-          <tbody id="cart-items" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody>
-        </table>
+      <div id="cart-items" class="space-y-4">
+        <!-- Cart items loaded dynamically as cards -->
       </div>
-      <div class="mt-6 flex items-center justify-between">
+      <div class="mt-8 flex items-center justify-between">
         <a class="flex items-center gap-2 text-primary font-bold hover:underline cursor-pointer" onclick="router.navigate('products.html')">
           <span class="material-symbols-outlined">arrow_back</span>Continue Shopping
         </a>
@@ -141,35 +130,31 @@
         const price = item.product?.price || item.price || 0;
         const qty = item.quantity || 1;
         subtotal += price * qty;
-        return `<tr class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-          <td class="px-6 py-5">
-            <div class="flex items-center gap-4">
-              <div class="h-20 w-20 rounded-lg bg-slate-100 dark:bg-slate-800 flex-shrink-0 bg-center bg-cover border border-slate-200 dark:border-slate-700" style="background-image: url('${item.product?.image_url || ''}')"></div>
-              <div>
-                <p class="font-bold text-slate-900 dark:text-white">${item.product?.name || item.name || 'Product'}</p>
-                <p class="text-sm text-slate-500 dark:text-slate-400">${item.product?.category || ''}</p>
+        return `
+          <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 md:p-6 flex flex-col sm:flex-row items-center gap-4 md:gap-6 group hover:border-primary/30 transition-all">
+            <div class="h-24 w-24 md:h-28 md:w-28 rounded-lg bg-slate-100 dark:bg-slate-800 flex-shrink-0 bg-center bg-cover border border-slate-200 dark:border-slate-700" style="background-image: url('${item.product?.image_url || 'https://placehold.co/100x100?text=' + encodeURIComponent(item.product?.name || "Product")}')"></div>
+            <div class="flex-1 text-center sm:text-left">
+              <p class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">${item.product?.category || 'General'}</p>
+              <h3 class="text-lg md:text-xl font-black text-slate-900 dark:text-white mt-1">${item.product?.name || item.name || 'Product'}</h3>
+              <p class="text-primary font-bold text-lg mt-1">$${price.toFixed(2)}</p>
+            </div>
+            <div class="flex flex-col sm:items-end gap-3 w-full sm:w-auto mt-4 sm:mt-0 pt-4 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800">
+              <div class="flex items-center justify-center sm:justify-end gap-2">
+                <button onclick="updateQty('${item.product?._id || item._id}', ${qty - 1})" class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+                  <span class="material-symbols-outlined text-lg">remove</span>
+                </button>
+                <span class="w-10 text-center font-bold text-lg">${qty}</span>
+                <button onclick="updateQty('${item.product?._id || item._id}', ${qty + 1})" class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+                  <span class="material-symbols-outlined text-lg">add</span>
+                </button>
+                <button onclick="removeFromCart('${item.product?._id || item._id}')" class="ml-2 w-10 h-10 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
               </div>
+              <p class="text-right font-black text-slate-900 dark:text-white text-lg hidden sm:block">$${(price * qty).toFixed(2)}</p>
             </div>
-          </td>
-          <td class="px-6 py-5 text-slate-700 dark:text-slate-300 font-medium">$${price.toFixed(2)}</td>
-          <td class="px-6 py-5">
-            <div class="flex items-center justify-center gap-1">
-              <button onclick="updateQty('${item.product?._id || item._id}', ${qty - 1})" class="w-8 h-8 flex items-center justify-center rounded-md border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
-                <span class="material-symbols-outlined text-lg">remove</span>
-              </button>
-              <span class="w-12 text-center font-medium text-slate-900 dark:text-white">${qty}</span>
-              <button onclick="updateQty('${item.product?._id || item._id}', ${qty + 1})" class="w-8 h-8 flex items-center justify-center rounded-md border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
-                <span class="material-symbols-outlined text-lg">add</span>
-              </button>
-            </div>
-          </td>
-          <td class="px-6 py-5 text-right font-bold text-slate-900 dark:text-white">$${(price * qty).toFixed(2)}</td>
-          <td class="px-6 py-5 text-center">
-            <button onclick="removeFromCart('${item.product?._id || item._id}')" class="text-slate-400 hover:text-red-500 transition-colors">
-              <span class="material-symbols-outlined">delete</span>
-            </button>
-          </td>
-        </tr>`;
+          </div>
+        `;
       }).join('');
 
       document.getElementById('subtotal').textContent = '$' + subtotal.toFixed(2);

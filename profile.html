@@ -75,46 +75,29 @@
   <div id="profile-content-area" style="display:none">
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
       <!-- Sidebar -->
-      <aside class="lg:col-span-1 space-y-2">
-        <a class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-lg font-semibold transition-colors" href="#">
-          <span class="material-icons">history</span> Order History
+      <aside class="lg:col-span-1 flex flex-col sm:flex-row lg:flex-col gap-2">
+        <a class="flex-1 flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-lg font-semibold transition-colors" href="#">
+          <span class="material-icons">history</span> <span class="text-sm">Order History</span>
         </a>
-        <button onclick="showChangePasswordForm()" class="w-full flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-primary/5 rounded-lg transition-colors">
-          <span class="material-icons">lock</span> Change Password
+        <button onclick="showChangePasswordForm()" class="flex-1 flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-primary/5 rounded-lg transition-colors text-left uppercase text-xs font-bold tracking-wider">
+          <span class="material-icons">lock</span> Password
         </button>
-        <a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-primary/5 rounded-lg transition-colors" href="cart.html">
-          <span class="material-icons">shopping_cart</span> My Cart
+        <a class="flex-1 flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-primary/5 rounded-lg transition-colors" href="cart.html">
+          <span class="material-icons">shopping_cart</span> <span class="text-sm">My Cart</span>
         </a>
-        <div class="pt-4 mt-4 border-t border-primary/10">
-          <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-colors">
-            <span class="material-icons">logout</span> Sign Out
-          </button>
-        </div>
+        <button onclick="logout()" class="flex-1 flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-colors text-left">
+          <span class="material-icons">logout</span> <span class="text-sm">Sign Out</span>
+        </button>
       </aside>
 
       <!-- Order History -->
       <div class="lg:col-span-3">
         <div class="bg-white dark:bg-slate-900/50 rounded-xl shadow-sm border border-primary/10">
-          <div class="p-6 border-b border-primary/10 flex justify-between items-center">
-            <h2 class="text-lg font-bold">Order History</h2>
+          <div class="p-4 md:p-6 border-b border-primary/10 flex justify-between items-center">
+            <h2 class="text-lg font-bold">Recent Orders</h2>
           </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left">
-              <thead>
-                <tr class="text-xs uppercase tracking-wider text-slate-400 bg-background-light dark:bg-background-dark/50">
-                  <th class="px-6 py-4 font-semibold">Order ID</th>
-                  <th class="px-6 py-4 font-semibold">Date</th>
-                  <th class="px-6 py-4 font-semibold">Total</th>
-                  <th class="px-6 py-4 font-semibold">Status</th>
-                  <th class="px-6 py-4 font-semibold">Delivery</th>
-                </tr>
-              </thead>
-              <tbody id="orders-list" class="divide-y divide-primary/5">
-                <tr>
-                  <td colspan="5" class="px-6 py-8 text-center text-slate-400">Loading orders...</td>
-                </tr>
-              </tbody>
-            </table>
+          <div id="orders-list" class="divide-y divide-primary/5">
+            <div class="p-8 text-center text-slate-400">Loading orders...</div>
           </div>
         </div>
       </div>
@@ -238,20 +221,26 @@
       const response = await api.get('/api/orders');
       const orders = response.orders;
 
-      if (!orders || orders.length === 0) {
-        ordersList.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400">No orders found.</td></tr>';
-        return;
-      }
-
       ordersList.innerHTML = orders.slice(0, 10).map(order => {
         const style = statusStyles[order.status] || 'bg-slate-100 text-slate-700';
-        return `<tr class="hover:bg-primary/5 transition-colors">
-          <td class="px-6 py-4 font-medium text-primary">#${order.id.slice(-8).toUpperCase()}</td>
-          <td class="px-6 py-4 text-sm">${new Date(order.created_at).toLocaleDateString()}</td>
-          <td class="px-6 py-4 font-bold">$${order.total_price.toFixed(2)}</td>
-          <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${style}"><span class="w-1.5 h-1.5 rounded-full mr-2 bg-current"></span>${order.status}</span></td>
-          <td class="px-6 py-4 text-sm text-slate-500">${order.delivery_status || '—'}</td>
-        </tr>`;
+        return `
+          <div class="p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 group hover:bg-primary/5 transition-colors">
+            <div class="flex flex-col gap-1">
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Order #${order.id.slice(-8).toUpperCase()}</p>
+              <p class="text-sm font-medium text-slate-600 dark:text-slate-300">${new Date(order.created_at).toLocaleDateString(undefined, {dateStyle: 'medium'})}</p>
+            </div>
+            <div class="flex items-center justify-between md:justify-end gap-6">
+              <div class="flex flex-col items-end">
+                <p class="text-lg font-black text-slate-900 dark:text-white">$${order.total_price.toFixed(2)}</p>
+                <p class="text-xs text-slate-500">${order.delivery_status || 'Standard Shipping'}</p>
+              </div>
+              <span class="inline-flex items-center px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${style}">
+                <span class="w-1.5 h-1.5 rounded-full mr-2 bg-current"></span>
+                ${order.status}
+              </span>
+            </div>
+          </div>
+        `;
       }).join('');
     } catch (err) {
       ordersList.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-slate-400">Could not load orders.</td></tr>';

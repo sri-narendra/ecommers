@@ -29,22 +29,41 @@
 <!-- Navigation -->
 <div id="navbar-placeholder"></div>
 
-<main class="max-w-7xl mx-auto w-full flex flex-col md:flex-row gap-8 px-4 md:px-10 lg:px-20 py-8 flex-grow">
-  <!-- Left Sidebar Filters -->
-  <aside class="w-full md:w-64 flex-shrink-0 space-y-8">
-    <div>
-      <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-        <span class="material-symbols-outlined text-primary">filter_list</span>
-        Filters
-      </h3>
-      <div class="mb-6">
-        <h4 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Categories</h4>
-        <ul id="category-list" class="space-y-2">
-          <li><div class="text-slate-400 text-xs flex items-center gap-2"><span class="material-symbols-outlined text-sm animate-spin">sync</span>Loading...</div></li>
-        </ul>
+  <!-- Mobile Filter Toggle -->
+  <div class="md:hidden px-4 py-4 border-b border-primary/5 bg-white dark:bg-slate-900 sticky top-[65px] z-40 flex justify-between items-center">
+    <button onclick="toggleMobileFilters()" class="flex items-center gap-2 bg-primary/5 text-primary px-4 py-2 rounded-lg font-bold text-sm">
+      <span class="material-symbols-outlined text-lg">filter_list</span>Filters
+    </button>
+    <p id="product-count-mobile" class="text-xs font-medium text-slate-500">Loading...</p>
+  </div>
+
+  <main class="max-w-7xl mx-auto w-full flex flex-col md:flex-row gap-8 px-4 md:px-10 lg:px-20 py-8 flex-grow">
+    <!-- Filters Sidebar/Drawer -->
+    <aside id="filters-sidebar" class="fixed inset-0 z-50 transform -translate-x-full transition-transform duration-300 md:relative md:translate-x-0 md:z-auto md:w-64 flex-shrink-0 bg-white dark:bg-background-dark md:bg-transparent p-6 md:p-0">
+      <div class="flex items-center justify-between mb-8 md:hidden">
+        <h2 class="text-xl font-bold flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">filter_list</span>Filters
+        </h2>
+        <button onclick="toggleMobileFilters()" class="text-slate-500"><span class="material-symbols-outlined">close</span></button>
       </div>
-    </div>
-  </aside>
+      <div class="space-y-8">
+        <div>
+          <h3 class="hidden md:flex text-lg font-bold mb-4 items-center gap-2">
+            <span class="material-symbols-outlined text-primary">filter_list</span>
+            Filters
+          </h3>
+          <div class="mb-6">
+            <h4 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Categories</h4>
+            <ul id="category-list" class="space-y-2">
+              <li><div class="text-slate-400 text-xs flex items-center gap-2"><span class="material-symbols-outlined text-sm animate-spin">sync</span>Loading...</div></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Overlay for mobile sidebar -->
+    <div id="filters-overlay" onclick="toggleMobileFilters()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden md:hidden"></div>
 
   <!-- Main Product Area -->
   <section class="flex-1">
@@ -65,7 +84,7 @@
     </div>
 
     <!-- Product Grid -->
-    <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div id="products-grid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
       <div class="col-span-full flex items-center justify-center py-16">
         <span class="material-symbols-outlined text-primary text-5xl animate-spin">sync</span>
       </div>

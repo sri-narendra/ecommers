@@ -50,20 +50,20 @@
   </div>
 
   <div id="product-content" class="hidden">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-20">
+    <div class="flex flex-col lg:flex-row gap-8 lg:gap-16 xl:gap-20">
       <!-- Image Gallery -->
-      <div class="space-y-4">
+      <div class="flex-1">
         <div class="aspect-square rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
           <img id="product-image" src="" alt="Product Image" class="w-full h-full object-cover"/>
         </div>
       </div>
 
       <!-- Product Info -->
-      <div class="flex flex-col justify-start">
-        <p id="product-category" class="text-sm font-bold tracking-widest uppercase text-primary mb-2"></p>
-        <h1 id="product-name" class="text-4xl font-black text-slate-900 dark:text-white leading-tight tracking-tight mb-4"></h1>
+      <div class="flex-1 flex flex-col">
+        <p id="product-category" class="text-xs md:text-sm font-bold tracking-widest uppercase text-primary mb-2"></p>
+        <h1 id="product-name" class="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white leading-tight tracking-tight mb-4"></h1>
         <div class="flex items-baseline gap-4 mb-6">
-          <span id="product-price" class="text-4xl font-black text-primary"></span>
+          <span id="product-price" class="text-3xl md:text-4xl font-black text-primary"></span>
         </div>
 
         <div id="low-stock-warning" class="hidden mb-4 flex items-center gap-2 text-sm font-bold text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-4 py-2 rounded-lg border border-amber-200 dark:border-amber-800">
@@ -71,7 +71,7 @@
           Only a few items left in stock!
         </div>
 
-        <p id="product-description" class="text-slate-600 dark:text-slate-400 text-base leading-relaxed mb-8"></p>
+        <p id="product-description" class="text-slate-600 dark:text-slate-400 text-base md:text-lg leading-relaxed mb-8"></p>
 
         <div class="flex items-center gap-4 mb-2 text-sm text-slate-500 dark:text-slate-400">
           <span class="material-symbols-outlined text-base">inventory_2</span>
