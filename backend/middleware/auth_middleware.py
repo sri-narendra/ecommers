@@ -24,10 +24,10 @@ def jwt_required_custom():
                 user = user_model.get_user_by_id(current_user_id)
                 if not user:
                     return standard_response(success=False, error='User not found or deleted', status_code=401)
-                
-                return fn(*args, **kwargs)
             except Exception as e:
                 return standard_response(success=False, error='Authentication required', status_code=401)
+            
+            return fn(*args, **kwargs)
         return decorator
     return wrapper
 
@@ -48,10 +48,10 @@ def admin_required():
                 
                 if not user or user.get('role') != 'admin':
                     return standard_response(success=False, error='Admin access required', status_code=403)
-                
-                return fn(*args, **kwargs)
             except Exception as e:
                 return standard_response(success=False, error='Authentication required', status_code=401)
+                
+            return fn(*args, **kwargs)
         return decorator
     return wrapper
 

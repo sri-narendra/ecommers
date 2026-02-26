@@ -1,7 +1,8 @@
 from flask import Blueprint, request, url_for
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from bson import ObjectId
-from extensions import mongo, fs
+from extensions import mongo
+import extensions
 from models.product_model import Product
 from middleware.auth_middleware import admin_required, jwt_required_custom
 from utils.helpers import standard_response, serialize_doc, serialize_list, validate_oid
@@ -94,7 +95,7 @@ def create_product():
             if file and file.filename != '':
                 try:
                     filename = secure_filename(file.filename)
-                    image_id = fs.put(file, filename=filename, content_type=file.content_type)
+                    image_id = extensions.fs.put(file, filename=filename, content_type=file.content_type)
                 except Exception as e:
                     return standard_response(success=False, error=f'Failed to upload image: {str(e)}', status_code=500)
 
@@ -149,7 +150,7 @@ def update_product(product_id):
                     filename = secure_filename(file.filename)
                     # We could delete old image here, but Product.delete_product handles cleanup of its specific image.
                     # For updates, we just set the new image_id.
-                    image_id = fs.put(file, filename=filename, content_type=file.content_type)
+                    image_id = extensions.fs.put(file, filename=filename, content_type=file.content_type)
                     data['image_id'] = str(image_id)
                 except Exception as e:
                     return standard_response(success=False, error=f'Failed to upload image: {str(e)}', status_code=500)

@@ -1,5 +1,6 @@
 from flask import Blueprint, request, send_file
-from extensions import mongo, fs
+from extensions import mongo
+import extensions
 from bson import ObjectId
 import gridfs
 import io
@@ -18,7 +19,7 @@ def get_image(image_id):
         return standard_response(success=False, error='Invalid image ID', status_code=400)
         
     try:
-        grid_out = fs.get(image_oid)
+        grid_out = extensions.fs.get(image_oid)
         return send_file(
             io.BytesIO(grid_out.read()),
             mimetype=grid_out.content_type,
@@ -44,7 +45,7 @@ def upload_image():
     try:
         filename = secure_filename(file.filename)
         # Save to GridFS
-        file_id = fs.put(
+        file_id = extensions.fs.put(
             file, 
             content_type=file.content_type, 
             filename=filename
@@ -84,8 +85,8 @@ def delete_image(image_id):
         return standard_response(success=False, error='Invalid image ID', status_code=400)
     
     try:
-        if fs.exists(image_oid):
-            fs.delete(image_oid)
+        if extensions.fs.exists(image_oid):
+            extensions.fs.delete(image_oid)
             return standard_response(success=True, message='Image deleted successfully')
         return standard_response(success=False, error='Image not found', status_code=404)
     except Exception as e:

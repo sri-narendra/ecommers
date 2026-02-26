@@ -2,7 +2,7 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from utils.helpers import get_now_utc
 from utils.constants import COLLECTION_PRODUCTS
-from extensions import fs
+import extensions
 
 class Product:
     def __init__(self, mongo):
@@ -91,9 +91,11 @@ class Product:
             if product and product.get('image_id'):
                 try:
                     from gridfs.errors import NoFile
-                    fs.delete(ObjectId(product['image_id']))
+                    import extensions
+                    extensions.fs.delete(ObjectId(product['image_id']))
                 except (NoFile, InvalidId, TypeError):
                     pass # Image already gone or invalid ID
+
             
             result = self.collection.delete_one({'_id': product_id})
             return result.deleted_count > 0
