@@ -5,7 +5,12 @@ load_dotenv()
 
 class Config:
     # MongoDB Configuration
-    MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/ecommerce')
+    _base_uri = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/ecommerce')
+    if 'serverSelectionTimeoutMS' not in _base_uri:
+        _sep = '&' if '?' in _base_uri else '?'
+        MONGO_URI = f"{_base_uri}{_sep}serverSelectionTimeoutMS=5000"
+    else:
+        MONGO_URI = _base_uri
     
     # JWT Configuration
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'your-secret-key-change-in-production')
