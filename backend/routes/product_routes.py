@@ -13,7 +13,11 @@ bp = Blueprint('products', __name__)
 def _add_image_url(product):
     """Helper to add full image URL (Bug Phase 3: 7)"""
     if product and product.get('image_id'):
-        product['image_url'] = url_for('images.get_image', image_id=product['image_id'], _external=True)
+        img_id = str(product['image_id'])
+        if img_id.startswith('http'):
+            product['image_url'] = img_id
+        else:
+            product['image_url'] = url_for('images.get_image', image_id=img_id, _external=True)
     elif product:
         product['image_url'] = None
     return product
@@ -114,10 +118,10 @@ def create_product():
         image_id=str(image_id) if image_id else data.get('image_id')
     )
     
-    if result['success']:
-        return standard_response(success=True, data=_add_image_url(serialize_doc(result['data'])), status_code=201)
+    if result:
+        return standard_response(success=True, data=_add_image_url(serialize_doc(result)), status_code=201)
     
-    return standard_response(success=False, error=result.get('error', 'Failed to create product'), status_code=400)
+    return standard_response(success=False, error='Failed to create product', status_code=400)
 
 @bp.route('/products/<product_id>', methods=['PUT'])
 @jwt_required_custom()

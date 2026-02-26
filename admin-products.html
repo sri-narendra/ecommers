@@ -131,7 +131,11 @@
           <input id="p-stock" class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-transparent focus:ring-primary focus:border-primary" placeholder="0" type="number"/>
         </div>
         <div>
-          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Product Image</label>
+          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Image URL</label>
+          <input id="p-image" class="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-transparent focus:ring-primary focus:border-primary" placeholder="https://..." type="text"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">...Or Upload Local Image file</label>
           <input id="p-image-file" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-transparent px-3 py-2 text-sm focus:ring-primary focus:border-primary file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" type="file" accept="image/*"/>
         </div>
         <div class="col-span-2">
@@ -237,7 +241,7 @@
   function showAddModal() {
     document.getElementById('modal-title').textContent = 'Add New Product';
     document.getElementById('edit-product-id').value = '';
-    ['p-name', 'p-price', 'p-stock', 'p-description'].forEach(id => document.getElementById(id).value = '');
+    ['p-name', 'p-price', 'p-stock', 'p-image', 'p-description'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('p-image-file').value = '';
     document.getElementById('product-modal').classList.remove('hidden');
   }
@@ -250,6 +254,7 @@
     document.getElementById('p-category').value = p.category || '';
     document.getElementById('p-price').value = p.price || '';
     document.getElementById('p-stock').value = p.stock || '';
+    document.getElementById('p-image').value = p.image_url || '';
     document.getElementById('p-image-file').value = ''; // Clear file input on edit
     document.getElementById('p-description').value = p.description || '';
     document.getElementById('product-modal').classList.remove('hidden');
@@ -274,6 +279,11 @@
     const imageFile = document.getElementById('p-image-file').files[0];
     if (imageFile) {
       formData.append('image', imageFile);
+    } else {
+      const imageUrl = document.getElementById('p-image').value.trim();
+      if (imageUrl) {
+        formData.append('image_id', imageUrl);
+      }
     }
 
     try {
