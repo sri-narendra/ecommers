@@ -425,9 +425,9 @@ async function updateDelivery(orderId, deliveryStatus) {
 // View order details
 async function viewOrderDetails(orderId) {
     try {
-        const response = await api.getOrder(orderId);
-        const order = response.data?.order || response.order;
-        const items = response.data?.items || response.items || (order && order.items) || [];
+        const response = await api.getAdminOrder(orderId);
+        const order = response.data || response.order;
+        const items = order.items || [];
 
         const modal = document.getElementById('order-details-modal');
         const content = document.getElementById('order-details-content');
@@ -436,13 +436,13 @@ async function viewOrderDetails(orderId) {
             content.innerHTML = `
                 <div class="order-info">
                     <h3>Order Information</h3>
-                    <p><strong>Order ID:</strong> ${order.id}</p>
-                    <p><strong>User ID:</strong> ${order.user_id}</p>
-                    <p><strong>Total:</strong> $${order.total_price.toFixed(2)}</p>
+                    <p><strong>Order ID:</strong> ${order.id || order._id}</p>
+                    <p><strong>Customer:</strong> ${order.user_name || 'Anonymous'}</p>
+                    <p><strong>Email:</strong> ${order.user_email || ''}</p>
+                    <p><strong>Total:</strong> $${((order.total_price || 0) / 100).toFixed(2)}</p>
                     <p><strong>Status:</strong> <span class="status-badge ${order.status}">${order.status.toUpperCase()}</span></p>
-                    <p><strong>Delivery Status:</strong> <span class="status-badge ${order.delivery_status}">${order.delivery_status.toUpperCase()}</span></p>
-                    <p><strong>Tracking Number:</strong> ${order.tracking_number || 'Not assigned'}</p>
-                    <p><strong>Date:</strong> ${formatDate(order.created_at)}</p>
+                    <p><strong>Payment:</strong> ${order.payment_method || 'COD'}</p>
+                    <p><strong>Date:</strong> ${new Date(order.created_at).toLocaleString()}</p>
                 </div>
                 
                 <div class="order-items">
@@ -461,8 +461,8 @@ async function viewOrderDetails(orderId) {
                                 <tr>
                                     <td>${escapeHtml(item.name)}</td>
                                     <td>${item.quantity}</td>
-                                    <td>$${item.price_at_purchase.toFixed(2)}</td>
-                                    <td>$${(item.price_at_purchase * item.quantity).toFixed(2)}</td>
+                                    <td>$${((item.price_at_purchase || 0) / 100).toFixed(2)}</td>
+                                    <td>$${(((item.price_at_purchase || 0) * item.quantity) / 100).toFixed(2)}</td>
                                 </tr>
                             `).join('')}
                         </tbody>

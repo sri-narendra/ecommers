@@ -26,7 +26,7 @@ def _get_quantity(val):
 def get_cart():
     """Get current user's cart (Bug Phase 3: 10)"""
     current_user_id = get_jwt_identity()
-    user_oid = _validate_object_id(current_user_id)
+    user_oid = validate_oid(current_user_id)
     if not user_oid:
         return standard_response(success=False, error='Invalid user ID', status_code=401)
     
@@ -277,7 +277,9 @@ def checkout():
     
     # 3. Create order
     order_model = Order(mongo)
-    order_res = order_model.create_order(user_oid, order_items, total_price_cents)
+    payment_method = request.json.get('payment_method', 'credit_card')
+    shipping_address = request.json.get('shipping_address')
+    order_res = order_model.create_order(user_oid, order_items, total_price_cents, shipping_address, payment_method)
     
     if not order_res['success']:
         # Bug Phase 3: 1 - Rollback stock if order creation fails

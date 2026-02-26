@@ -107,14 +107,34 @@
 <script src="js/footer.js"></script>
 <script src="js/auth.js"></script>
 <script>
-  // ... rest of the setup
+  let allProducts = [];
+  let currentCategory = '';
+  let currentSort = 'name';
+
+  // Maps category names to material icons
+  const CATEGORY_ICONS = {
+    electronics: 'devices', technology: 'laptop_mac', tech: 'devices',
+    clothing: 'checkroom', fashion: 'checkroom', apparel: 'checkroom', shoes: 'footprint',
+    home: 'chair', furniture: 'chair', living: 'home',
+    sports: 'fitness_center', sport: 'fitness_center', outdoor: 'park',
+    jewelry: 'diamond', accessories: 'watch',
+    books: 'menu_book', beauty: 'spa', food: 'restaurant',
+    toys: 'toys', games: 'sports_esports', health: 'health_and_safety',
+  };
+
+  function getCatIcon(cat) {
+    const key = (cat || '').toLowerCase().trim();
+    return CATEGORY_ICONS[key] || 'category';
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     initPage(async () => {
         const params = new URLSearchParams(window.location.search);
         if (params.get('category')) currentCategory = params.get('category');
         if (params.get('search')) {
             const query = params.get('search');
-            document.getElementById('search-input-mock')?.value = query; // Sync search if possible
+            const searchMock = document.getElementById('search-input-mock');
+            if (searchMock) searchMock.value = query; // Sync search if possible
         }
         await loadProducts();
 
@@ -129,14 +149,25 @@
 
   async function loadProducts() {
     try {
+      showLoader();
       const response = await api.get('/api/products');
       allProducts = response.data?.products || response.products || [];
+      
       buildCategorySidebar(allProducts);
+      
       applyFilters();
     } catch (error) {
       console.error('Failed to load products:', error);
-      document.getElementById('products-grid').innerHTML = '';
-      document.getElementById('no-products').classList.remove('hidden');
+      document.getElementById('products-grid').innerHTML = `
+        <div class="col-span-full text-center py-16 text-red-500">
+            <span class="material-symbols-outlined text-5xl">error</span>
+            <p class="mt-4 font-bold">Failed to load products. ${error.message || ''}</p>
+            <button onclick="loadProducts()" class="mt-4 text-primary underline">Try Again</button>
+        </div>
+      `;
+      document.getElementById('no-products').classList.add('hidden');
+    } finally {
+      hideLoader();
     }
   }
 

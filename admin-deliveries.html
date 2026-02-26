@@ -186,7 +186,7 @@
       const badge = STATUS_BADGES[status] || STATUS_BADGES.pending;
       const icon = STATUS_ICONS[status] || 'help';
       const orderId = o.id || o._id || '';
-      const customer = o.user_id || 'Customer';
+      const customer = o.user_name || (o.user_id ? o.user_id.slice(-6) : 'Guest');
       const date = o.created_at ? new Date(o.created_at).toLocaleDateString() : 'N/A';
       return `<tr class="hover:bg-primary/5 dark:hover:bg-primary/5 transition-colors group">
         <td class="px-6 py-5 font-bold text-sm text-slate-900 dark:text-slate-100">#${orderId.slice(-6)}</td>

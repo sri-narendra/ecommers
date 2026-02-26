@@ -7,9 +7,11 @@ class APIClient {
     }
 
     getBaseURL() {
-        // In production, this should be your Render backend URL
-        // In development, use localhost
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Handle local filesystem access or localhost
+        if (window.location.hostname === 'localhost' || 
+            window.location.hostname === '127.0.0.1' || 
+            window.location.protocol === 'file:' || 
+            !window.location.hostname) {
             return 'http://localhost:5000';
         } else {
             // Replace with your actual Render backend URL
@@ -266,6 +268,10 @@ class APIClient {
 
     async getAllOrders() {
         return this.get('/api/admin/orders');
+    }
+
+    async getAdminOrder(id) {
+        return this.get(`/api/admin/orders/${id}`);
     }
 
     async updateOrderStatus(id, status) {

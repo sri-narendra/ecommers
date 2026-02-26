@@ -89,18 +89,29 @@
           <div class="flex flex-col sm:flex-row gap-3 md:gap-4">
             <label class="flex-1 flex items-center justify-between p-3 md:p-4 border-2 border-primary rounded-xl cursor-pointer bg-primary/5">
               <div class="flex items-center gap-2 md:gap-3">
-                <span class="material-symbols-outlined text-primary">credit_card</span>
-                <span class="font-bold text-sm md:text-base">Credit Card</span>
+          <!-- Payment Selection -->
+          <div class="space-y-4">
+              <h3 class="text-xs font-black uppercase tracking-[0.2em] text-primary mb-6">Payment Method</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <label class="payment-method-label cursor-pointer relative">
+                      <input type="radio" name="payment_method" value="credit_card" checked class="peer sr-only">
+                      <div class="p-4 rounded-xl border-2 border-slate-100 dark:border-slate-800 peer-checked:border-primary peer-checked:bg-primary/5 transition-all">
+                          <div class="flex items-center gap-3">
+                              <span class="material-symbols-outlined text-slate-400 peer-checked:text-primary">credit_card</span>
+                              <span class="font-bold text-sm">Credit Card</span>
+                          </div>
+                      </div>
+                  </label>
+                  <label class="payment-method-label cursor-pointer relative">
+                      <input type="radio" name="payment_method" value="cod" class="peer sr-only">
+                      <div class="p-4 rounded-xl border-2 border-slate-100 dark:border-slate-800 peer-checked:border-primary peer-checked:bg-primary/5 transition-all">
+                          <div class="flex items-center gap-3">
+                              <span class="material-symbols-outlined text-slate-400 peer-checked:text-primary">payments</span>
+                              <span class="font-bold text-sm">Cash on Delivery</span>
+                          </div>
+                      </div>
+                  </label>
               </div>
-              <div class="w-4 h-4 rounded-full border-4 border-primary bg-white"></div>
-            </label>
-            <label class="flex-1 flex items-center justify-between p-3 md:p-4 border-2 border-slate-100 dark:border-slate-800 rounded-xl cursor-pointer">
-              <div class="flex items-center gap-2 md:gap-3">
-                <span class="material-symbols-outlined text-slate-500">account_balance_wallet</span>
-                <span class="font-bold text-sm md:text-base">COD</span>
-              </div>
-              <div class="w-4 h-4 rounded-full border-2 border-slate-300 bg-white"></div>
-            </label>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div class="flex flex-col gap-1 md:gap-2 md:col-span-2">
@@ -142,8 +153,8 @@
             <span id="summary-total" class="text-primary">$0.00</span>
           </div>
         </div>
-        <button onclick="placeOrder()" id="place-order-btn" class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl mt-8 flex items-center justify-center gap-2 transition-all active:scale-95 text-sm md:text-base">
-          <span class="material-symbols-outlined">lock</span>Place Order
+        <button id="place-order-btn" onclick="placeOrder()" class="w-full py-4 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all hover:-translate-y-1 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+            Place Order
         </button>
         <p class="text-center text-[10px] md:text-xs text-slate-400 mt-4 flex items-center justify-center gap-1">
           <span class="material-symbols-outlined text-[14px]">verified_user</span>SSL Encrypted Checkout
@@ -181,9 +192,12 @@
       const items = cart?.items || [];
 
       if (!items || items.length === 0) { 
+          document.getElementById('checkout-loading').classList.add('hidden');
           router.navigate('cart.html');
           return; 
       }
+
+      document.getElementById('checkout-loading').classList.add('hidden');
 
       content.classList.remove('hidden');
 
@@ -211,6 +225,8 @@
       else showToast('Could not load cart data.', 'error');
     } finally {
       hideLoader();
+      const loader = document.getElementById('checkout-loading');
+      if (loader) loader.classList.add('hidden');
     }
   }
 
@@ -225,27 +241,45 @@
       return;
     }
 
-    btn.disabled = true;
-    btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Placing Order...';
-
+    const paymentMethod = document.querySelector('input[name="payment_method"]:checked')?.value || 'credit_card';
+        
     try {
-      const res = await api.checkout({
-        shipping_address: { 
-            name: firstName + ' ' + lastName, 
-            address, 
-            city: document.getElementById('city').value, 
-            zip: document.getElementById('zip').value 
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Processing...';
+        showLoader();
+        
+        // Collect any additional fields if needed
+        const orderData = {
+            shipping_address: { 
+                name: firstName + ' ' + lastName, 
+                address, 
+                city: document.getElementById('city').value, 
+                zip: document.getElementById('zip').value 
+            },
+            payment_method: paymentMethod
+        };
+
+        const response = await api.checkout(orderData);
+        const orderId = response.data?.order?._id || response.data?.order?.id || response.order_id;
+
+        if (response.success) {
+            showToast('Order placed successfully!', 'success');
+            btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Order Placed!';
+            setTimeout(() => router.navigate('order-success.html', { orderId: orderId }), 1000);
+        } else {
+            showToast(response.error || 'Checkout failed', 'error');
+            btn.disabled = false;
+            btn.innerHTML = 'Place Order';
         }
-      });
-      
-      const orderId = res.data?.order?._id || res.data?.order?.id || res.order_id;
-      
-      btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Order Placed!';
-      setTimeout(() => router.navigate('order-success.html', { orderId: orderId }), 1000);
-    } catch (err) {
-      btn.disabled = false;
-      btn.innerHTML = '<span class="material-symbols-outlined">lock</span> Place Order';
-      showToast('Error placing order: ' + (err.message || 'Please try again.'), 'error');
+    } catch (error) {
+        console.error('Checkout error:', error);
+        showToast(error.message || 'Could not place order', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined">lock</span> Place Order';
+    } finally {
+        hideLoader();
+        const loader = document.getElementById('checkout-loading');
+        if (loader) loader.classList.add('hidden');
     }
   }
 </script>

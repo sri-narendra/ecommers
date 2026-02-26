@@ -13,7 +13,7 @@ class Order:
     def __init__(self, mongo):
         self.collection = mongo.db[COLLECTION_ORDERS]
     
-    def create_order(self, user_id, items, total_price_cents):
+    def create_order(self, user_id, items, total_price_cents, shipping_address=None, payment_method='credit_card'):
         """Create a new order with integer cents (Bug Phase 3: 3, 9)"""
         try:
             # Bug Phase 3: 3 - total_price_cents is already in cents
@@ -21,6 +21,8 @@ class Order:
                 'user_id': ObjectId(user_id) if isinstance(user_id, str) else user_id,
                 'items': items, # List of {product_id, quantity, price_at_purchase_cents}
                 'total_price': int(total_price_cents),
+                'shipping_address': shipping_address,
+                'payment_method': payment_method,
                 'status': ORDER_STATUS_PENDING,
                 'delivery_status': DELIVERY_STATUS_PROCESSING,
                 'tracking_number': None,
@@ -58,6 +60,35 @@ class Order:
         """Get all orders (for admin)"""
         try:
             return list(self.collection.find().sort('created_at', -1))
+        except Exception:
+            return []
+
+    def get_all_orders_with_users(self):
+        """Get all orders with joined user details (for admin)"""
+        try:
+            from utils.constants import COLLECTION_USERS
+            pipeline = [
+                {
+                    '$lookup': {
+                        'from': COLLECTION_USERS,
+                        'localField': 'user_id',
+                        'foreignField': '_id',
+                        'as': 'user'
+                    }
+                },
+                {
+                    '$unwind': {
+                        'path': '$user',
+                        'preserveNullAndEmptyArrays': True
+                    }
+                },
+                {
+                    '$sort': {
+                        'created_at': -1
+                    }
+                }
+            ]
+            return list(self.collection.aggregate(pipeline))
         except Exception:
             return []
     

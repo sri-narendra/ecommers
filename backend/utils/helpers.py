@@ -14,19 +14,29 @@ def validate_oid(id_str):
         return None
 
 def serialize_doc(doc):
-    """Serialize a single MongoDB document (Bug Phase 1: 1)"""
+    """Serialize a MongoDB document recursively (Bug Phase 1: 1, Phase 3: Order items)"""
+    print(f"DEBUG: Serializing {type(doc)}")
     if doc is None:
         return None
-    doc = dict(doc)
-    if "_id" in doc:
-        doc["_id"] = str(doc["_id"])
     
-    # Handle nested ObjectIds if any (recursive simplification)
-    for key, value in doc.items():
-        if isinstance(value, ObjectId):
-            doc[key] = str(value)
-        elif isinstance(value, datetime):
-            doc[key] = value.replace(tzinfo=timezone.utc).isoformat()
+    if isinstance(doc, dict):
+        new_doc = {}
+        for key, value in doc.items():
+            if key == "_id":
+                new_doc["_id"] = str(value)
+            else:
+                new_doc[key] = serialize_doc(value)
+        return new_doc
+    
+    elif isinstance(doc, list):
+        return [serialize_doc(item) for item in doc]
+    
+    elif isinstance(doc, ObjectId):
+        return str(doc)
+    
+    elif isinstance(doc, datetime):
+        return doc.replace(tzinfo=timezone.utc).isoformat()
+    
     return doc
 
 def serialize_list(cursor):

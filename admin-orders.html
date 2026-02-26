@@ -44,6 +44,10 @@
           <h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Order Management</h1>
           <p class="text-slate-500 dark:text-slate-400 mt-1">Streamline your fulfillment process and track customer deliveries.</p>
         </div>
+        <button onclick="exportOrdersToCSV()" class="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm">
+          <span class="material-symbols-outlined text-lg">download</span>
+          Export CSV
+        </button>
       </div>
 
       <!-- Filters -->
@@ -78,10 +82,34 @@
         <div id="table-footer" class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
           <p id="order-count" class="text-sm text-slate-500">Loading...</p>
         </div>
-      </div>
     </div>
   </section>
 </main>
+
+<!-- Order Details Modal -->
+<div id="order-modal" class="hidden fixed inset-0 z-[100] overflow-y-auto">
+  <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+    <div class="fixed inset-0 bg-slate-900/60 transition-opacity backdrop-blur-sm" onclick="closeOrderModal()"></div>
+    <div class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-slate-900 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-2xl border border-slate-200 dark:border-slate-800">
+      <div class="px-6 py-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50">
+        <div>
+          <h3 class="text-xl font-black text-slate-900 dark:text-white tracking-tight" id="modal-order-id">Order Details</h3>
+          <p class="text-xs text-slate-500 mt-1" id="modal-order-date"></p>
+        </div>
+        <button onclick="closeOrderModal()" class="size-10 flex items-center justify-center rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="px-8 py-8 space-y-8 max-h-[70vh] overflow-y-auto" id="modal-content">
+        <!-- Dynamic content here -->
+      </div>
+      <div class="px-8 py-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex justify-end">
+        <button onclick="closeOrderModal()" class="px-6 py-2.5 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </div>
 </div>
 
@@ -107,15 +135,25 @@
         adminLayout.render();
         await loadOrders();
     });
+
+    // Close dropdowns on outside click
+    window.addEventListener('click', (e) => {
+      if (!e.target.closest('.dropdown-trigger') && !e.target.closest('.dropdown-menu')) {
+        document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden'));
+      }
+    });
   });
 
   async function loadOrders() {
     try {
+      showLoader();
       const res = await api.get('/api/admin/orders');
       allOrders = res.data?.orders || res.orders || [];
       renderOrders(allOrders);
     } catch (err) {
       document.getElementById('orders-table').innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-slate-400">${err.status === 401 ? '<a href="login.html" class="text-primary font-bold">Please login</a>' : 'Error loading orders.'}</td></tr>`;
+    } finally {
+      hideLoader();
     }
   }
 
@@ -142,9 +180,10 @@
       const status = o.status || 'pending';
       const colorClass = STATUS_COLORS[status] || STATUS_COLORS.pending;
       const orderId = o.id || o._id || '';
-      const customer = o.user_id || 'Customer';
+       const customer = o.user_name || (o.user_id ? o.user_id.slice(-6) : 'Guest');
       const date = o.created_at ? new Date(o.created_at).toLocaleDateString() : 'N/A';
-      const amount = (o.total_price || 0).toFixed(2);
+      const amount = (o.total_price / 100).toFixed(2);
+      
       return `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
         <td class="px-6 py-4"><span class="font-mono text-sm font-bold text-primary">#${orderId.slice(-6)}</span></td>
         <td class="px-6 py-4">
@@ -164,20 +203,176 @@
             <option value="cancelled" ${status==='cancelled'?'selected':''}>Cancelled</option>
           </select>
         </td>
-        <td class="px-6 py-4 text-right">
-          <button class="text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined">more_horiz</span></button>
+        <td class="px-6 py-4 text-right relative">
+          <button onclick="toggleDropdown(event, '${orderId}')" class="dropdown-trigger size-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-primary hover:bg-primary/10 transition-all">
+            <span class="material-symbols-outlined">more_horiz</span>
+          </button>
+          
+          <div id="dropdown-${orderId}" class="dropdown-menu hidden absolute right-6 top-12 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-800 z-50 overflow-hidden">
+            <button onclick="viewOrderDetails('${orderId}')" class="w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors">
+              <span class="material-symbols-outlined text-lg text-slate-400">visibility</span>View Details
+            </button>
+            <button onclick="cancelOrder('${orderId}')" class="w-full text-left px-4 py-2.5 text-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 flex items-center gap-2 transition-colors border-t border-slate-100 dark:border-slate-800">
+              <span class="material-symbols-outlined text-lg">cancel</span>Cancel Order
+            </button>
+          </div>
         </td>
       </tr>`;
     }).join('');
   }
 
+  function toggleDropdown(event, orderId) {
+    event.stopPropagation();
+    const allMenus = document.querySelectorAll('.dropdown-menu');
+    const target = document.getElementById(`dropdown-${orderId}`);
+    const isHidden = target.classList.contains('hidden');
+    
+    allMenus.forEach(m => m.classList.add('hidden'));
+    if (isHidden) target.classList.remove('hidden');
+  }
+
   async function updateOrderStatus(orderId, status) {
     try {
-      // Correct endpoint: /api/admin/orders/<id>/status with PUT
       await api.put('/api/admin/orders/' + orderId + '/status', { status });
       const order = allOrders.find(o => (o.id || o._id) === orderId);
       if (order) order.status = status;
-    } catch (err) { alert('Error updating status: ' + err.message); loadOrders(); }
+      showToast(`Order #${orderId.slice(-6)} marked as ${status}`, 'success');
+      renderOrders(currentFilter === 'all' ? allOrders : allOrders.filter(o => (o.status || 'pending') === currentFilter));
+    } catch (err) { 
+      showToast('Error updating status: ' + err.message, 'error'); 
+      loadOrders(); 
+    }
+  }
+
+  async function cancelOrder(orderId) {
+    if (!confirm('Are you sure you want to cancel this order?')) return;
+    await updateOrderStatus(orderId, 'cancelled');
+  }
+
+  async function viewOrderDetails(orderId) {
+    try {
+      showLoader();
+      const res = await api.get('/api/admin/orders/' + orderId);
+      const order = res.data || res.order;
+      const items = res.data?.items || res.order?.items || [];
+      
+      document.getElementById('modal-order-id').textContent = `Order #${orderId.slice(-6)}`;
+      document.getElementById('modal-order-date').textContent = `Placed on ${new Date(order.created_at).toLocaleString()}`;
+      
+      const content = document.getElementById('modal-content');
+      content.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <h4 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Customer Info</h4>
+            <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+               <p class="text-sm font-bold text-slate-900 dark:text-white">${order.user_name || 'Anonymous'}</p>
+               <p class="text-xs text-slate-500">${order.user_email || ''}</p>
+               <p class="text-xs text-slate-500 mt-2">Payment: ${order.payment_method || 'COD'}</p>
+            </div>
+          </div>
+          <div>
+            <h4 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Shipping Address</h4>
+            <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800 text-sm">
+                ${order.shipping_address ? `
+                    <p class="font-bold">${order.shipping_address.name || 'N/A'}</p>
+                    <p>${order.shipping_address.address || ''}</p>
+                    <p>${order.shipping_address.city || ''} ${order.shipping_address.zip || ''}</p>
+                ` : '<p class="text-slate-400 italic">No address provided</p>'}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Order Items</h4>
+          <div class="space-y-3">
+            ${items.map(item => `
+              <div class="flex items-center gap-4 bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                <div class="size-12 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center font-bold text-slate-400 text-xs uppercase">IMG</div>
+                <div class="flex-1">
+                  <p class="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">${item.name || 'Product'}</p>
+                   <p class="text-xs text-slate-500">Qty: ${item.quantity} × $${((item.price_at_purchase || 0) / 100).toFixed(2)}</p>
+                </div>
+                <p class="text-sm font-black text-primary">$${(((item.price_at_purchase || 0) * item.quantity) / 100).toFixed(2)}</p>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center p-6 bg-primary/5 rounded-2xl border border-primary/10 mt-4">
+          <span class="text-sm font-bold text-slate-600 dark:text-slate-400">Total Amount</span>
+          <span class="text-2xl font-black text-primary">$${((order.total_price || 0) / 100).toFixed(2)}</span>
+        </div>
+      `;
+      
+      document.getElementById('order-modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    } catch (err) {
+      showToast('Failed to load order details: ' + err.message, 'error');
+    } finally {
+      hideLoader();
+    }
+  }
+
+  function closeOrderModal() {
+    document.getElementById('order-modal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+  }
+
+  function exportOrdersToCSV() {
+    if (!allOrders || allOrders.length === 0) {
+      showToast('No orders available to export', 'error');
+      return;
+    }
+
+    const headers = [
+      'Order ID', 'Date', 'Customer', 'Email', 
+      'Shipping Name', 'Shipping Address', 'Shipping City', 'Shipping ZIP',
+      'Total ($)', 'Status', 'Payment Method'
+    ];
+    const rows = allOrders.map(o => {
+      const orderId = o.id || o._id || '';
+      const date = o.created_at ? new Date(o.created_at).toLocaleString() : 'N/A';
+      const customer = o.user_name || (o.user_id ? o.user_id.slice(-6) : 'Guest');
+      const email = o.user_email || '';
+      const amount = (o.total_price / 100).toFixed(2);
+      const status = o.status || 'pending';
+      const payment = o.payment_method || 'COD';
+      
+      const addr = o.shipping_address || {};
+      const shipName = addr.name || '';
+      const shipAddr = (addr.address || '').replace(/,/g, ' '); // Avoid CSV injection
+      const shipCity = addr.city || '';
+      const shipZip = addr.zip || '';
+
+      return [
+        `#${orderId}`,
+        `"${date}"`,
+        `"${customer}"`,
+        `"${email}"`,
+        `"${shipName}"`,
+        `"${shipAddr}"`,
+        `"${shipCity}"`,
+        `"${shipZip}"`,
+        amount,
+        status.toUpperCase(),
+        payment
+      ].join(',');
+    });
+
+    const csvContent = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const timestamp = new Date().toISOString().split('T')[0];
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `orders_export_${timestamp}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showToast('Orders exported successfully', 'success');
   }
 
   function logout() {

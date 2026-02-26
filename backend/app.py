@@ -77,4 +77,7 @@ def create_app():
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=Config.DEBUG)
+    import os
+    # Disable reloader on Windows to prevent socket/select issues
+    use_reloader = os.name != 'nt'
+    app.run(debug=Config.DEBUG, use_reloader=use_reloader)

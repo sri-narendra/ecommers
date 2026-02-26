@@ -140,29 +140,30 @@
   document.addEventListener('DOMContentLoaded', () => {
     initPage(async () => {
         adminLayout.render();
-        loadAdminStats();
-        loadRecentOrders();
+        await loadAdminStats();
+        await loadRecentOrders();
     });
   });
 
   async function loadAdminStats() {
     try {
-      // Use the dedicated dashboard endpoint for aggregated stats
-      const dashRes = await api.get('/api/admin/dashboard');
-      const dash = dashRes.dashboard || {};
+      const response = await api.get('/api/admin/dashboard');
+      const dash = response.data?.dashboard || response.dashboard || {};
+      
       document.getElementById('stat-users').textContent = dash.total_users ?? '—';
       document.getElementById('stat-products').textContent = dash.total_products ?? '—';
       document.getElementById('stat-orders').textContent = dash.total_orders ?? '—';
+      
+      // Revenue is already in dollars from backend now
+      document.getElementById('stat-revenue').textContent = '$' + (dash.total_revenue || 0).toFixed(2);
 
-      // Get orders to compute total revenue
+      // Draw dynamic chart if orders are available
       const ordersRes = await api.get('/api/admin/orders');
-      const orders = ordersRes.orders || [];
-      const revenue = orders.reduce((sum, o) => sum + (o.total_price || 0), 0);
-      document.getElementById('stat-revenue').textContent = '$' + revenue.toFixed(2);
-
-      // Draw dynamic chart from monthly data
+      const orders = ordersRes.data?.orders || ordersRes.orders || [];
       drawRevenueChart(orders);
-    } catch (err) { console.error('Stats error:', err); }
+    } catch (err) { 
+        console.error('Stats error:', err); 
+    }
   }
 
   function drawRevenueChart(orders) {
@@ -173,25 +174,20 @@
       return { label: d.toLocaleString('default', { month: 'short' }), total: 0, key: `${d.getFullYear()}-${d.getMonth()}` };
     });
     orders.forEach(o => {
+      if (!o.created_at) return;
       const d = new Date(o.created_at);
       const key = `${d.getFullYear()}-${d.getMonth()}`;
       const bucket = months.find(m => m.key === key);
-      if (bucket) bucket.total += (o.total_price || 0);
+      if (bucket) bucket.total += ((o.total_price || 0) / 100);
     });
     const maxVal = Math.max(...months.map(m => m.total), 1);
-    const W = 478, H = 150;
-    const pts = months.map((m, i) => {
-      const x = (i / (months.length - 1)) * W;
-      const y = H - (m.total / maxVal) * (H - 10) - 5;
-      return [x, y];
-    });
-    const lineD = pts.map((p, i) => (i === 0 ? `M${p[0]} ${p[1]}` : `L${p[0]} ${p[1]}`)).join(' ');
-    const areaD = lineD + ` L${W} ${H} L0 ${H} Z`;
     const chartContainer = document.getElementById('revenue-chart-container');
+    if (!chartContainer) return;
+
     chartContainer.innerHTML = `
-      <div class="flex items-end justify-between mb-2 gap-2">
-        ${months.map(m => `<div class="flex flex-col items-center gap-1 flex-1">
-          <div class="w-full rounded-t-sm bg-primary/80" style="height:${Math.max(4, (m.total/maxVal)*140)}px"></div>
+      <div class="flex items-end justify-between mb-2 gap-2 h-full">
+        ${months.map(m => `<div class="flex flex-col items-center gap-1 flex-1 h-full justify-end">
+          <div class="w-full rounded-t-sm bg-primary/80 transition-all duration-500" style="height:${Math.max(4, (m.total/maxVal)*100)}%"></div>
           <span class="text-[10px] text-slate-500">${m.label}</span>
         </div>`).join('')}
       </div>
@@ -202,21 +198,36 @@
     try {
       const res = await api.get('/api/admin/orders');
       const orders = (res.data?.orders || res.orders || []).slice(0, 5);
-      const el = document.getElementById('recent-orders');
-      if (!orders.length) { el.innerHTML = '<p class="text-slate-400 text-sm">No orders found.</p>'; return; }
+      const el = document.getElementById('recent-orders-list'); // Correct ID from admin.html
+      if (!el) return;
+
+      if (orders.length === 0) {
+        el.innerHTML = '<tr><td colspan="5" class="py-12 text-center text-slate-400">No orders found.</td></tr>';
+        return;
+      }
+
       el.innerHTML = orders.map(o => `
-        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-          <div>
-            <p class="text-sm font-semibold">#${(o.id || o._id || '').slice(-6) || 'N/A'}</p>
-            <p class="text-xs text-slate-500">${o.user_id || 'Customer'} • ${o.created_at ? new Date(o.created_at).toLocaleDateString() : 'N/A'}</p>
-          </div>
-          <div class="flex flex-col items-end gap-1">
-            <span class="text-xs font-bold text-slate-900 dark:text-white">$${(o.total_price || 0).toFixed(2)}</span>
-            <span class="rounded-full px-2 py-0.5 text-[10px] font-bold ${o.status === 'delivered' ? 'bg-emerald-100 text-emerald-700' : o.status === 'shipped' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}">${(o.status || 'pending').toUpperCase()}</span>
-          </div>
-        </div>
+        <tr class="border-b border-primary/5 hover:bg-primary/[0.02] transition-colors group cursor-pointer" onclick="router.navigate('admin-orders.html')">
+          <td class="py-4 px-2 font-mono text-xs text-slate-500">#${(o.id || o._id || '').slice(-8)}</td>
+          <td class="py-4 font-bold text-sm">${o.user_name || o.user_id || 'Customer'}</td>
+          <td class="py-4 px-2">
+            <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${getStatusBadgeClass(o.status)}">${o.status || 'PENDING'}</span>
+          </td>
+          <td class="py-4 font-black text-sm text-primary">$${((o.total_price || 0) / 100).toFixed(2)}</td>
+          <td class="py-4 text-slate-400">
+            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">chevron_right</span>
+          </td>
+        </tr>
       `).join('');
     } catch (err) { console.error('Orders error:', err); }
+  }
+
+  function getStatusBadgeClass(status) {
+    const s = status?.toLowerCase() || '';
+    if (s === 'delivered') return 'bg-green-100 text-green-600';
+    if (s === 'pending') return 'bg-amber-100 text-amber-600';
+    if (s === 'cancelled') return 'bg-red-100 text-red-600';
+    return 'bg-primary/10 text-primary';
   }
 
   function logout() {

@@ -16,7 +16,7 @@ from utils.constants import (
 
 bp = Blueprint('admin', __name__)
 
-@bp.route('/dashboard', methods=['GET'])
+@bp.route('/admin/dashboard', methods=['GET'])
 @jwt_required_custom()
 @admin_required()
 def admin_dashboard():
@@ -46,15 +46,16 @@ def admin_dashboard():
                 'total_products': total_products,
                 'total_orders': total_orders,
                 'total_revenue': total_revenue_cents / 100, # convert cents to dollars
-                'low_stock_products_count': len(low_stock_products)
-            },
-            'low_stock_products': [
-                {
-                    '_id': str(p['_id']),
-                    'name': p['name'],
-                    'stock': p['stock']
-                } for p in low_stock_products
-            ]
+                'low_stock_count': len(low_stock_products),
+                'low_stock_products': [
+                    {
+                        '_id': str(p['_id']),
+                        'name': p['name'],
+                        'stock': p['stock'],
+                        'category': p.get('category', 'N/A')
+                    } for p in low_stock_products
+                ]
+            }
         }
     )
 
@@ -71,10 +72,83 @@ def get_users():
 @jwt_required_custom()
 @admin_required()
 def get_all_orders():
-    """Get all orders (admin only)"""
+    """Get all orders with user info (admin only)"""
     order_model = Order(mongo)
-    orders = order_model.get_all_orders()
-    return standard_response(success=True, data={'orders': serialize_list(orders)})
+    orders = order_model.get_all_orders_with_users()
+    
+    # Flatten user info for easier frontend use
+    formatted_orders = []
+    for o in orders:
+        user = o.get('user', {})
+        order_doc = serialize_doc(o)
+        order_doc['user_name'] = user.get('name', 'Unknown')
+        order_doc['user_email'] = user.get('email', 'Unknown')
+        # Remove the full user object to keep response clean
+        if 'user' in order_doc: del order_doc['user']
+        formatted_orders.append(order_doc)
+        
+    return standard_response(success=True, data={'orders': formatted_orders})
+
+@bp.route('/admin/orders/<order_id>', methods=['GET'])
+@jwt_required_custom()
+@admin_required()
+def get_admin_order_details(order_id):
+    """Get single order details for admin (admin only)"""
+    order_oid = validate_oid(order_id)
+    if not order_oid:
+        return standard_response(success=False, error='Invalid order ID', status_code=400)
+        
+    from utils.constants import COLLECTION_USERS
+    pipeline = [
+        {'$match': {'_id': order_oid}},
+        {
+            '$lookup': {
+                'from': COLLECTION_USERS,
+                'localField': 'user_id',
+                'foreignField': '_id',
+                'as': 'user'
+            }
+        },
+        {
+            '$unwind': {
+                'path': '$user',
+                'preserveNullAndEmptyArrays': True
+            }
+        }
+    ]
+    
+    results = list(mongo.db.orders.aggregate(pipeline))
+    if not results:
+        return standard_response(success=False, error='Order not found', status_code=404)
+        
+    order = results[0]
+    user = order.get('user', {})
+    product_model = Product(mongo)
+        
+    # Re-using the logic from _format_order_with_items but since it's in a different BP, 
+    # we'll do it here or move it to a helper. Let's keep it simple for now and use serialize_doc.
+    # Actually, we need the product details for the modal.
+    
+    formatted_items = []
+    for item in order.get('items', []):
+        product = product_model.get_product_by_id(item['product_id'])
+        if product:
+            img_url = url_for('images.get_image', image_id=product['image_id'], _external=True) if product.get('image_id') else None
+            formatted_items.append({
+                'product_id': str(product['_id']),
+                'name': product['name'],
+                'quantity': item['quantity'],
+                'price_at_purchase': item.get('price_at_purchase'),
+                'image_url': img_url
+            })
+    
+    order_doc = serialize_doc(order)
+    order_doc['user_name'] = user.get('name', 'Unknown')
+    order_doc['user_email'] = user.get('email', 'Unknown')
+    if 'user' in order_doc: del order_doc['user']
+    order_doc['items'] = formatted_items
+    
+    return standard_response(success=True, data=order_doc)
 
 @bp.route('/admin/orders/<order_id>/status', methods=['PUT'])
 @jwt_required_custom()

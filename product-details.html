@@ -152,6 +152,7 @@
     const productId = getProductIdFromUrl();
     const content = document.getElementById('product-content');
     const notFound = document.getElementById('product-not-found');
+    const loader = document.getElementById('product-loading');
 
     if (!productId) {
       router.navigate('products.html');
@@ -161,11 +162,18 @@
     try {
       const response = await api.get('/api/products/' + productId);
       const product = response.data || response.product;
+      
+      if (!product) throw new Error('Product data missing in response');
+      
       currentProductId = productId;
 
       document.getElementById('product-image').src = product.image_url || 'https://placehold.co/600x600/e2e8f0/94a3b8?text=' + encodeURIComponent(product.name);
       document.getElementById('product-name').textContent = product.name;
-      document.getElementById('product-price').textContent = '$' + product.price.toFixed(2);
+      
+      // Handle price formatting safely
+      const price = typeof product.price === 'number' ? product.price : parseFloat(product.price || 0);
+      document.getElementById('product-price').textContent = '$' + price.toFixed(2);
+      
       document.getElementById('product-description').textContent = product.description || '';
       document.getElementById('product-stock-text').textContent = `${product.stock} units available`;
       document.getElementById('product-category').textContent = formatCategory(product.category);
@@ -180,13 +188,17 @@
       }
 
       content.classList.remove('hidden');
+      if (loader) loader.classList.add('hidden');
     } catch (error) {
       console.error('Failed to load product:', error);
+      if (loader) loader.classList.add('hidden');
       notFound.classList.remove('hidden');
-      // Show error for 2s then redirect
+      // Show error for 3s then redirect if it's a 404 or similar
       setTimeout(() => {
-          router.navigate('products.html');
-      }, 2000);
+          if (notFound.offsetParent !== null) { // only if still on the not-found state
+            router.navigate('products.html');
+          }
+      }, 3000);
     }
   }
 
