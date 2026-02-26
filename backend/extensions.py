@@ -27,8 +27,8 @@ def init_extensions(app: Flask):
     # Initialize JWT
     jwt.init_app(app)
     
-    # Initialize CORS with permissive settings for debugging
-    CORS(app, resources={r"/*": {"origins": "*"}}, 
+    # Initialize CORS properly using specified origins
+    CORS(app, resources={r"/*": {"origins": app.config.get('CORS_ORIGINS', [])}}, 
          supports_credentials=True,
          allow_headers="*",
          methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])

@@ -49,9 +49,21 @@ def create_app():
         if app.debug:
             app.logger.info(f"Method: {request.method} | Path: {request.path} | Origin: {request.headers.get('Origin')}")
 
+    # Render Root Health Check
+    @app.route('/')
+    def index():
+        return jsonify({
+            'status': 'online',
+            'message': 'E-commerce backend is live.'
+        })
+
+    from werkzeug.exceptions import HTTPException
+
     # Global error handler to ensure CORS headers are returned on errors
     @app.errorhandler(Exception)
     def handle_exception(e):
+        if isinstance(e, HTTPException):
+            return e # Let Flask natively handle 404s, 502s, etc with proper headers
         app.logger.error(f"Unhandled Exception: {str(e)}")
         response = jsonify({
             'success': False,

@@ -19,7 +19,7 @@ class Config:
     # Flask Configuration
     DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
     # Strip whitespace from origins and add common defaults
-    _default_origins = 'http://localhost:3000,http://127.0.0.1:5500,https://sri-narendra.github.io, *'
+    _default_origins = 'http://localhost:3000,http://127.0.0.1:5500,https://sri-narendra.github.io'
     CORS_ORIGINS = [o.strip() for o in os.environ.get('CORS_ORIGINS', _default_origins).split(',')]
     
     # Image Upload Configuration
