@@ -116,7 +116,7 @@
   async function loadCart() {
     try {
       const response = await api.get('/api/cart');
-      const items = response.cart?.items || response.items || [];
+      const items = response.data?.cart?.items || response.cart?.items || response.items || [];
       document.getElementById('cart-loading').style.display = 'none';
 
       if (!items || items.length === 0) {

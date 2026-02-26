@@ -221,7 +221,7 @@
     const ordersList = document.getElementById('orders-list');
     try {
       const response = await api.get('/api/orders');
-      const orders = response.orders;
+      const orders = response.data?.orders || response.orders || [];
 
       ordersList.innerHTML = orders.slice(0, 10).map(order => {
         const style = statusStyles[order.status] || 'bg-slate-100 text-slate-700';

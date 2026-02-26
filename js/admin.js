@@ -6,7 +6,7 @@ async function loadAdminDashboard() {
 
     try {
         const response = await api.getDashboard();
-        const dashboard = response.dashboard;
+        const dashboard = response.data?.dashboard || response.dashboard;
 
         displayDashboardStats(dashboard);
         displayLowStockProducts(dashboard.low_stock_products);
@@ -97,7 +97,7 @@ async function loadAdminProducts() {
 
     try {
         const response = await api.getProducts();
-        const products = response.products;
+        const products = response.data?.products || response.products;
 
         displayAdminProducts(products);
         setupProductEventListeners();
@@ -149,7 +149,7 @@ async function loadAdminOrders() {
 
     try {
         const response = await api.getAllOrders();
-        const orders = response.orders;
+        const orders = response.data?.orders || response.orders;
 
         displayAdminOrders(orders);
         setupOrderEventListeners();
@@ -196,7 +196,7 @@ async function loadAdminDeliveries() {
 
     try {
         const response = await api.getAllOrders();
-        const orders = response.orders;
+        const orders = response.data?.orders || response.orders;
 
         // Filter to show only orders that need delivery management
         const deliveryOrders = orders.filter(order => 
@@ -426,8 +426,8 @@ async function updateDelivery(orderId, deliveryStatus) {
 async function viewOrderDetails(orderId) {
     try {
         const response = await api.getOrder(orderId);
-        const order = response.order;
-        const items = response.items;
+        const order = response.data?.order || response.order;
+        const items = response.data?.items || response.items || (order && order.items) || [];
 
         const modal = document.getElementById('order-details-modal');
         const content = document.getElementById('order-details-content');

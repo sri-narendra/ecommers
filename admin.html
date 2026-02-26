@@ -201,7 +201,7 @@
   async function loadRecentOrders() {
     try {
       const res = await api.get('/api/admin/orders');
-      const orders = (res.orders || []).slice(0, 5);
+      const orders = (res.data?.orders || res.orders || []).slice(0, 5);
       const el = document.getElementById('recent-orders');
       if (!orders.length) { el.innerHTML = '<p class="text-slate-400 text-sm">No orders found.</p>'; return; }
       el.innerHTML = orders.map(o => `

@@ -4,7 +4,7 @@
 async function loadCart() {
     try {
         const response = await api.getCart();
-        const cart = response.cart;
+        const cart = response.data?.cart || response.cart;
 
         displayCartItems(cart.items);
         updateCartTotal(cart.total);
@@ -165,7 +165,8 @@ async function checkout() {
     try {
         const response = await api.checkout();
         showToast('Order placed successfully!', 'success');
-        window.location.href = `checkout.html?order_id=${response.order.id}`;
+        const orderObj = response.data?.order || response.order;
+        window.location.href = `checkout.html?order_id=${orderObj?.id || orderObj?._id}`;
     } catch (error) {
         console.error('Error during checkout:', error);
         if (error.status === 400) {

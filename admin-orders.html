@@ -112,7 +112,7 @@
   async function loadOrders() {
     try {
       const res = await api.get('/api/admin/orders');
-      allOrders = res.orders || [];
+      allOrders = res.data?.orders || res.orders || [];
       renderOrders(allOrders);
     } catch (err) {
       document.getElementById('orders-table').innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-slate-400">${err.status === 401 ? '<a href="login.html" class="text-primary font-bold">Please login</a>' : 'Error loading orders.'}</td></tr>`;

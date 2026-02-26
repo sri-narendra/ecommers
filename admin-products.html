@@ -171,7 +171,7 @@
   async function loadProducts() {
     try {
       const res = await api.get('/api/products');
-      allProducts = res.products || [];
+      allProducts = res.data?.products || res.products || [];
       updateStats();
       buildCategoryDropdown(allProducts);
       renderProducts(allProducts);

@@ -4,7 +4,7 @@
 async function loadProfile() {
     try {
         const response = await api.getProfile();
-        const user = response.user;
+        const user = response.data?.user || response.user;
 
         displayUserProfile(user);
         loadUserOrders();
@@ -103,7 +103,7 @@ function displayUserProfile(user) {
 async function loadUserOrders() {
     try {
         const response = await api.getOrders();
-        const orders = response.orders;
+        const orders = response.data?.orders || response.orders;
 
         displayUserOrders(orders);
     } catch (error) {
@@ -161,8 +161,8 @@ function displayUserOrders(orders) {
 async function viewOrderDetails(orderId) {
     try {
         const response = await api.getOrder(orderId);
-        const order = response.order;
-        const items = response.items;
+        const order = response.data?.order || response.order;
+        const items = response.data?.items || response.items || (order && order.items) || [];
 
         // Create modal or redirect to order page
         const modal = document.getElementById('order-details-modal');

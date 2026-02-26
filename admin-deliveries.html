@@ -148,7 +148,7 @@
   async function loadDeliveries() {
     try {
       const res = await api.get('/api/admin/orders');
-      allDeliveries = res.orders || [];
+      allDeliveries = res.data?.orders || res.orders || [];
       updateStats();
       renderDeliveries(allDeliveries);
     } catch (err) {

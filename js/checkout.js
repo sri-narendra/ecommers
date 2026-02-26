@@ -11,7 +11,7 @@ async function loadCheckout() {
         // Load existing order
         try {
             const response = await api.getOrder(orderId);
-            selectedOrder = response.order;
+            selectedOrder = response.data?.order || response.order;
             displayOrderSummary(selectedOrder);
         } catch (error) {
             console.error('Error loading order:', error);
@@ -162,7 +162,8 @@ async function handleCheckout(e) {
         showToast('Order placed successfully!', 'success');
         
         // Redirect to order success page
-        window.location.href = `checkout.html?order_id=${response.order.id}`;
+        const orderObj = response.data?.order || response.order;
+        window.location.href = `checkout.html?order_id=${orderObj?.id || orderObj?._id}`;
     } catch (error) {
         console.error('Error during checkout:', error);
         if (error.status === 400) {

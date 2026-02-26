@@ -8,7 +8,7 @@ let currentSort = 'name';
 async function loadProducts() {
     try {
         const response = await api.getProducts();
-        allProducts = response.products;
+        allProducts = response.data?.products || response.products;
         
         applyFilters();
         setupEventListeners();
@@ -30,7 +30,7 @@ const performSearch = debounce(async (query) => {
     
     try {
         const response = await api.searchProducts(query);
-        displayProducts(response.products);
+        displayProducts(response.data?.products || response.products);
     } catch (error) {
         console.error('Error searching products:', error);
         showToast('Search failed', 'error');
@@ -197,7 +197,7 @@ async function updateCartCount() {
 async function getProduct(productId) {
     try {
         const response = await api.getProduct(productId);
-        return response.product;
+        return response.data || response.product;
     } catch (error) {
         console.error('Error fetching product:', error);
         return null;
@@ -208,7 +208,7 @@ async function getProduct(productId) {
 async function getProductsByCategory(category) {
     try {
         const response = await api.getProducts(category);
-        return response.products;
+        return response.data?.products || response.products;
     } catch (error) {
         console.error('Error fetching products by category:', error);
         return [];
@@ -219,7 +219,7 @@ async function getProductsByCategory(category) {
 async function getLowStockProducts(threshold = 5) {
     try {
         const response = await api.getLowStockProducts(threshold);
-        return response.products;
+        return response.data?.products || response.products;
     } catch (error) {
         console.error('Error fetching low stock products:', error);
         return [];
